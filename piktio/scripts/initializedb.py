@@ -1,14 +1,11 @@
 import os
 import sys
 import transaction
-
 from sqlalchemy import engine_from_config
-
 from pyramid.paster import (
     get_appsettings,
     setup_logging,
     )
-
 from pyramid.scripts.common import parse_vars
 
 from ..models import (
@@ -16,6 +13,8 @@ from ..models import (
     MyModel,
     Base,
     )
+from ..configure import configure
+from .. import expandvars_dict
 
 
 def usage(argv):
@@ -32,6 +31,8 @@ def main(argv=sys.argv):
     options = parse_vars(argv[2:])
     setup_logging(config_uri)
     settings = get_appsettings(config_uri, options=options)
+    configure()
+    settings = expandvars_dict(settings)
     engine = engine_from_config(settings, 'sqlalchemy.')
     DBSession.configure(bind=engine)
     Base.metadata.create_all(engine)
