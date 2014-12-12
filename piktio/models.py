@@ -4,6 +4,7 @@ from sqlalchemy import (
     Table,
     Unicode,
     ForeignKey,
+    types,
     )
 
 from sqlalchemy.ext.declarative import declarative_base
@@ -17,7 +18,7 @@ from sqlalchemy.orm import (
 
 from zope.sqlalchemy import ZopeTransactionExtension
 
-from apex.models import AuthID
+from apex.models import (AuthID, AuthUser)
 
 DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
 Base = declarative_base()
