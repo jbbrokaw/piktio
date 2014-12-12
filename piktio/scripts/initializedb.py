@@ -14,7 +14,7 @@ from ..models import (
     )
 from ..configure import configure
 from .. import expandvars_dict
-
+import apex.models
 
 def usage(argv):
     cmd = os.path.basename(argv[0])
@@ -34,5 +34,5 @@ def main(argv=sys.argv):
     settings = expandvars_dict(settings)
     engine = engine_from_config(settings, 'sqlalchemy.')
     DBSession.configure(bind=engine)
-    Base.metadata.drop_all(engine)
+    apex.models.Base.metadata.create_all(engine)
     Base.metadata.create_all(engine)

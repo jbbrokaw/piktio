@@ -23,12 +23,12 @@ DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
 Base = declarative_base()
 
 follower_followee = Table("follower_followee", Base.metadata,
-    Column("follower_id", Integer, ForeignKey("auth_user_profile.id"), primary_key=True),
-    Column("followee_id", Integer, ForeignKey("auth_user_profile.id"), primary_key=True))
+    Column("follower_id", Integer, ForeignKey("piktio_profile.id"), primary_key=True),
+    Column("followee_id", Integer, ForeignKey("piktio_profile.id"), primary_key=True))
 
 
 class PiktioProfile(Base):
-    __tablename__ = 'auth_user_profile'
+    __tablename__ = 'piktio_profile'
 
     id = Column(Integer, primary_key=True)
     auth_id = Column(Integer, ForeignKey(AuthID.id), index=True)
