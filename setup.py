@@ -10,14 +10,18 @@ with open(os.path.join(here, 'CHANGES.txt')) as f:
 
 requires = [
     'pyramid',
-    'pyramid_chameleon',
     'pyramid_debugtoolbar',
     'pyramid_tm',
     'SQLAlchemy',
     'transaction',
     'zope.sqlalchemy',
     'waitress',
-    'psycopg2'
+    'psycopg2',
+    'pyramid_jinja2',
+    'apex',
+    'Paste',
+    'WebError',
+    'repoze.tm2'
     ]
 
 setup(name='piktio',
