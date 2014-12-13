@@ -7,15 +7,25 @@ import os
 from .models import (
     DBSession,
     Base,
-    )
-
-from .views import callback
+    PiktioProfile
+)
 
 
 def expandvars_dict(settings):
     """Expands all environment variables in a settings dictionary."""
     return dict((key, os.path.expandvars(value)) for
                 key, value in settings.iteritems())
+
+
+def get_user(request):
+    user_id = request.authenticated_userid
+    if user_id:
+        user = DBSession.query(PiktioProfile) \
+            .filter(PiktioProfile.auth_id == user_id) \
+            .first()
+    else:
+        user = None
+    return user
 
 
 def main(global_config, **settings):
@@ -27,14 +37,14 @@ def main(global_config, **settings):
     DBSession.configure(bind=engine)
     Base.metadata.bind = engine
     config = Configurator(settings=settings)
-    config.include('pyramid_chameleon')
-    # config.add_route('apex_callback', '/auth/apex_callback')
-    # config.add_view(callback, route_name='apex_callback', permission=NO_PERMISSION_REQUIRED)
+    config.include('pyramid_jinja2')
+    config.add_jinja2_renderer('.html')
+    config.add_request_method('piktio.get_user', 'user', reify=True)
     config.include('apex', route_prefix='/auth')
     config.include('velruse.providers.facebook')
     config.add_facebook_login_from_settings(prefix='facebook.')
     # config.include('velruse.providers.google_oauth2')
-    # config.add_facebook_login_from_settings(prefix='google.')
+    # config.add_google_login_from_settings(prefix='google.')
     config.add_static_view('static', 'static', cache_max_age=3600)
     config.add_route('home', '/')
     config.scan()

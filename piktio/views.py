@@ -8,7 +8,7 @@ from apex.lib.flash import flash
 from .models import (
     DBSession,
     PiktioProfile,
-    )
+)
 
 from apex.models import (AuthID, AuthUser, AuthGroup)
 
@@ -16,8 +16,8 @@ from apex.lib.libapex import apex_settings, get_module, apex_remember
 from apex import MessageFactory as _
 
 
-@view_config(route_name='home', renderer='templates/mytemplate.pt')
-def my_view(request):
+@view_config(route_name='home', renderer='templates/step_one.html')
+def home(request):
     try:
         one = DBSession.query(PiktioProfile).first()
     except DBAPIError:
@@ -42,7 +42,7 @@ def callback(request):
         user = AuthUser(
             login=profile['preferredUsername'],
             provider=request.context.provider_name,
-            )
+        )
         if profile.has_key('email'):
             user.email = profile['email']
         if profile.has_key('displayName'):
@@ -69,14 +69,15 @@ def callback(request):
             request.session['id'] = id.id
             request.session['userid'] = user.id
             return HTTPFound(location='%s?came_from=%s' %
-                             (route_url('apex_openid_required', request),
-                             request.GET.get('came_from',
-                             route_url(apex_settings('came_from_route'), request))))
+                                      (route_url('apex_openid_required', request),
+                                       request.GET.get('came_from',
+                                                       route_url(apex_settings('came_from_route'), request))))
     headers = apex_remember(request, user)
     redir = request.GET.get('came_from',
                             route_url(apex_settings('came_from_route'), request))
     flash(_('Successfully Logged in, welcome!'), 'success')
     return HTTPFound(location=redir, headers=headers)
+
 
 conn_err_msg = """\
 Pyramid is having a problem using your SQL database.  The problem
