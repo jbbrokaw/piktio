@@ -1,7 +1,7 @@
 from apex.forms import RegisterForm
 
-from piktio.models import PiktioProfile
-from apex.models import DBSession, AuthID, AuthUser, AuthGroup
+from piktio.models import PiktioProfile, DBSession
+from apex.models import AuthID, AuthUser, AuthGroup
 from apex import MessageFactory as _
 from wtforms import StringField, validators
 from sqlalchemy.orm.exc import NoResultFound
@@ -9,9 +9,6 @@ from sqlalchemy.orm.exc import NoResultFound
 
 def create_user(**kwargs):
     """
-
-::
-
     from apex.lib.libapex import create_user
 
     create_user(username='test', password='my_password', active='Y')
@@ -20,8 +17,6 @@ def create_user(**kwargs):
 
     display_name
     group
-
-
 
     Returns: AuthID object
     """
@@ -52,12 +47,13 @@ def create_user(**kwargs):
     DBSession.flush()
     return user
 
+
 class NewRegisterForm(RegisterForm):
     display_name = StringField(_('Display Name'), [validators.DataRequired(),
                                validators.Length(min=4, max=25)])
 
-    def after_signup(self, user):
-        profile = PiktioProfile(auth_id=user.id, display_name=user.display_name)
+    def after_signup(self, user, request=None):
+        profile = PiktioProfile(auth_id=user.auth_id, display_name=user.display_name)
         DBSession.add(profile)
         DBSession.flush()
 

@@ -32,7 +32,7 @@ class PiktioProfile(Base):
     __tablename__ = 'piktio_profile'
 
     id = Column(Integer, primary_key=True)
-    auth_id = Column(Integer, ForeignKey(AuthID.id), index=True)
+    auth_id = Column(Integer, ForeignKey(AuthID.id), index=True, nullable=False)
 
     followers = relationship("PiktioProfile",
                         secondary=follower_followee,

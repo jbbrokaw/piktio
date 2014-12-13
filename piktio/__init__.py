@@ -1,4 +1,5 @@
 from pyramid.config import Configurator
+from pyramid.security import NO_PERMISSION_REQUIRED
 from sqlalchemy import engine_from_config
 
 import configure
@@ -7,6 +8,8 @@ from .models import (
     DBSession,
     Base,
     )
+
+from .views import callback
 
 
 def expandvars_dict(settings):
@@ -25,6 +28,8 @@ def main(global_config, **settings):
     Base.metadata.bind = engine
     config = Configurator(settings=settings)
     config.include('pyramid_chameleon')
+    # config.add_route('apex_callback', '/auth/apex_callback')
+    # config.add_view(callback, route_name='apex_callback', permission=NO_PERMISSION_REQUIRED)
     config.include('apex', route_prefix='/auth')
     config.include('velruse.providers.facebook')
     config.add_facebook_login_from_settings(prefix='facebook.')
