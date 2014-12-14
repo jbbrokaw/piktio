@@ -18,11 +18,8 @@ from apex import MessageFactory as _
 
 @view_config(route_name='home', renderer='templates/step_one.html')
 def home(request):
-    try:
-        one = DBSession.query(PiktioProfile).first()
-    except DBAPIError:
-        return Response(conn_err_msg, content_type='text/plain', status_int=500)
-    return {'one': one, 'project': 'piktio'}
+    context = {'user': request.user}
+    return context
 
 
 @view_config(

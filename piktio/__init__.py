@@ -38,6 +38,7 @@ def main(global_config, **settings):
     Base.metadata.bind = engine
     config = Configurator(settings=settings)
     config.include('pyramid_jinja2')
+    config.include('pyramid_mako')
     config.add_jinja2_renderer('.html')
     config.add_request_method('piktio.get_user', 'user', reify=True)
     config.include('apex', route_prefix='/auth')
