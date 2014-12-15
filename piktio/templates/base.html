@@ -2,8 +2,8 @@
 <html>
 <head>
   <title>Piktio</title>
-  <link rel="stylesheet" type="text/css" href="/static/layout.css">
-  <link rel="stylesheet" type="text/css" href="/static/style.css">
+  <link rel="stylesheet" type="text/css" href="{{'piktio:static/css/layout.css'|static_url}}">
+  <link rel="stylesheet" type="text/css" href="{{'piktio:static/css/style.css'|static_url}}">
   {% block stylesheets %}{% endblock %}
 </head>
 <body>
@@ -13,8 +13,8 @@
       <div class="status-area">
         {% if request.user %}
         <p> Logged in as {{ request.user.display_name }}</p>
-        <p><a href="{{ request.route_url('apex_logout') }}">Log out</a></p>
-        <!-- <p><a href="{{ request.route_url('home') }}">Show Completed Games</a></p> -->
+        <p><a href="{{ 'apex_logout' | route_url }}">Log out</a></p>
+        <!-- <p><a href="{{ 'home' | route_url }}">Show Completed Games</a></p> -->
         {% else %}
         <a href="{{ request.route_url('apex_login') }}">Login</a>
         {% endif %}
@@ -25,10 +25,10 @@
     </section>
     <footer class="cf">
       <ul class="left-footer cf">
-        <li><a href="{{ request.route_url('apex_logout') }}">Log out</a></li>
-        <!-- <p><a href="{{ request.route_url('home') }}">Show Completed Games</a></p> -->
+        <li><a href="{{ 'apex_logout' | route_url }}">Log out</a></li>
+        <!-- <p><a href="{{ 'home' | route_url }}">Show Completed Games</a></p> -->
       </ul>
-      <a class="right-footer" href="{{ request.route_url('home') }}">Help</a>
+      <a class="right-footer" href="{{ 'home' | route_url }}">Help</a>
       <p class="center-footer">Created by Jason</p>
     </footer>
   </div>
