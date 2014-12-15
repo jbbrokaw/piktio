@@ -1,0 +1,56 @@
+header {
+  background-color: rgb(5, 171, 235);
+}
+
+.main-title {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 3em;
+  font-style: normal;
+  font-variant: normal;
+  font-weight: bold;
+  line-height: 1;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: -2px;
+}
+
+.container {
+  background-color: rgb(190, 236, 254);
+}
+
+a {
+  color: white;
+  font-family: 'Droid Serif', serif;
+}
+
+p {
+  color: white;
+  font-family: 'Droid Serif', serif;
+}
+
+a:hover {
+  color: rgb(255,36,31);
+}
+
+a:visited {
+  color: rgb(255,133,0);
+}
+
+.prompt {
+  text-align: center;
+  color: rgb(255,133,0);
+}
+
+footer {
+  text-align: center;
+  background-color: rgb(5, 171, 235);
+}
+
+.left-footer {
+  text-align: left;
+  list-style: none;
+}
+
+.center-footer {
+  color: white;
+}

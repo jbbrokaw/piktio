@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block stylesheets %}
+<link rel="stylesheet" type="text/css" href="/static/typing.css">
+{% endblock %}
+{% block body %}
+<h1 class="section-title">Write the subject of a sentence</h1>
+<h2 class="instructions">Try to make it something fun to draw</h2>
+<textarea id="prompt-entry" rows="3" cols="42"></textarea>
+<button id="submit-text" class="t-button">Submit</button>
+{% endblock %}
+{% block scripts %}
+<script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+<script type="text/javascript" src="/static/scripts.js"></script>
+{% endblock %}

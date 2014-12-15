@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Piktio</title>
+  <link rel="stylesheet" type="text/css" href="/static/layout.css">
+  <link rel="stylesheet" type="text/css" href="/static/style.css">
+  {% block stylesheets %}{% endblock %}
+</head>
+<body>
+  <div class="container">
+    <header class="cf">
+      <a href="/"><h1 class="main-title">Piktio</h1></a>
+      <div class="status-area">
+        {% if request.user %}
+        <p> Logged in as {{ request.user.display_name }}</p>
+        <p><a href="{{ request.route_url('apex_logout') }}">Log out</a></p>
+        <!-- <p><a href="{{ request.route_url('home') }}">Show Completed Games</a></p> -->
+        {% else %}
+        <a href="{{ request.route_url('apex_login') }}">Login</a>
+        {% endif %}
+      </div>
+    </header>
+    <section id="content" class="cf">
+      {% block body %}{% endblock %}
+    </section>
+    <footer class="cf">
+      <ul class="left-footer cf">
+        <li><a href="{{ request.route_url('apex_logout') }}">Log out</a></li>
+        <!-- <p><a href="{{ request.route_url('home') }}">Show Completed Games</a></p> -->
+      </ul>
+      <a class="right-footer" href="{{ request.route_url('home') }}">Help</a>
+      <p class="center-footer">Created by Jason</p>
+    </footer>
+  </div>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

@@ -18,10 +18,12 @@ requires = [
     'waitress',
     'psycopg2',
     'pyramid_jinja2',
+    'pyramid_mako',
     'apex',
     'Paste',
     'WebError',
-    'repoze.tm2'
+    'repoze.tm2',
+    'webtest',
     ]
 
 setup(name='piktio',
