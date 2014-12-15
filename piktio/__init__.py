@@ -4,7 +4,7 @@ from sqlalchemy import engine_from_config
 
 import configure
 import os
-from .models import (
+from piktio.models import (
     DBSession,
     Base,
     PiktioProfile

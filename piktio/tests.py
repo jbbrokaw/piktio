@@ -1,9 +1,13 @@
 import unittest
 
 from pyramid import testing
+import transaction
 
-from .models import DBSession, PiktioProfile
+from apex.models import AuthUser, AuthID
+from piktio.models import DBSession, PiktioProfile
 from webtest import TestApp
+from piktio.forms import NewRegisterForm, create_user
+# from apex.lib.libapex import create_user
 
 
 class TestFunctionalLogin(unittest.TestCase):
@@ -13,10 +17,12 @@ class TestFunctionalLogin(unittest.TestCase):
         engine = create_engine('sqlite://')
         from .models import Base
         import apex.models
+        transaction.begin()
         DBSession.configure(bind=engine)
         Base.metadata.create_all(engine)
         apex.models.Base.metadata.create_all(engine)
         DBSession.flush()
+        transaction.commit()
         from piktio import main
         settings = {'sqlalchemy.url': 'sqlite://',
                     'apex.session_secret': '${APEX_SESSION_SECRET}',
@@ -32,23 +38,28 @@ class TestFunctionalLogin(unittest.TestCase):
         DBSession.remove()
         testing.tearDown()
 
-    def test_register(self):
-        res = self.testapp.get('/auth/register', extra_environ={'REMOTE_ADDR': 'local.piktio.com'})
-        csrf = res.form.fields['csrf_token'][0].value
-        res = self.testapp.post('/auth/register',
-            {
-                'submit': True,
-                'login': 'testy',
-                'password': 'temp',
-                'display_name': 'TESTY',
-                'email': 'testy@testy.com',
-                'csrf_token': csrf
-            }, extra_environ={'REMOTE_ADDR': 'local.piktio.com'}
-        )
-        new_user = DBSession.query(PiktioProfile).filter(PiktioProfile.display_name == "TESTY").first()
-        self.assertIsNotNone(new_user)
-        self.assertEqual(200, res.status_code)
+    def test_apex_overwrites_and_login(self):
+        """Test my rewrites of apex functions & forms and that login works"""
+        testuser = {}
+        testuser['password'] = "password"
+        testuser['display_name'] = "Testy"
+        with transaction.manager:
+            dumdum = NewRegisterForm(obj=testuser)
+            auth_id = create_user(username="test", password="password", display_name="Testy")
+            dumdum.after_signup(auth_id)
+        auth_id = DBSession.query(AuthID).first()
+        user = DBSession.query(AuthUser).first()
+        profile = DBSession.query(PiktioProfile).first()
+        self.assertEqual(auth_id.id, user.auth_id)
+        self.assertEqual(profile.auth_id, auth_id.id)
+        self.assertEqual(profile.display_name, "Testy")
+        self.assertEqual(user.login, "test")
 
-    def test_login(self):
-        res = self.testapp.post('/auth/login', {'login': 'testy', 'password': 'temp'})
-        self.assertIn('TESTY', res.body)
+        csrf_resp = self.testapp.get('/auth/login')
+        csrf = csrf_resp.form.fields['csrf_token'][0].value
+        res = self.testapp.post('/auth/login', {'login': 'test',
+                                                'password': 'password',
+                                                'csrf_token': csrf})
+        self.assertEqual(302, res.status_code)
+        new_res = self.testapp.get('/')
+        self.assertIn("Testy", new_res.body)
