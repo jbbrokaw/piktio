@@ -4,7 +4,7 @@
 <script id="text-entry" type="text/x-handlebars-template">
   <h1 class="section-title">{{ title }}</h1>
   <h2 class="instructions">{{ instructions }}</h2>
-  <textarea id="prompt-entry" rows="3" cols="42"></textarea>
+  <textarea id="prompt-entry" rows="3" cols="42", maxlength="72"></textarea>
   <button id="submit-text" class="t-button">Submit</button>
 {% endraw %}
   <input id="csrf" type="hidden" name="csrf_token" value="{{ request.session.get_csrf_token() }}">

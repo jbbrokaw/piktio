@@ -4,40 +4,43 @@
 var textEntrySource   = $("#text-entry").html();
 var textEntryTemplate = Handlebars.compile(textEntrySource);
 
-var Subject = Backbone.Model.extend({
+var TextArea = Backbone.Model.extend({
   url: '/subject',
   defaults: {
     'title': 'Enter the subject of a sentence',
-    'instructions': 'Like "The happy brown bear"'
+    'instructions': 'Like "The happy brown bear"',
+    'route': '/subject'
   }
 });
 
-var SubjectView = Backbone.View.extend({
+var TextEntryView = Backbone.View.extend({
 
   events: {
-    'click button': 'submitSubject'
+    'click button': 'submitText'
   },
 
   render: function () {
     this.setElement($('#content').empty().get(0));
     $(this.el).html(textEntryTemplate(this.model.toJSON()));
+    this.model.set('csrf_token', $('#csrf').val());
     return this;
   },
 
-  submitSubject: function () {
-    console.log("submitting whatever here");
+  submitText: function () {
     if ($('#prompt-entry').val() === "") {
       alert("You have to type something in the entry box");
       return;
     }
-    var payload = {'prompt': $('#prompt-entry').val(),
-               'csrf_token': $('#csrf').val()};
-    $.post('/subject', payload).done(function (model, response, options) {
-      console.log("Save succeeded.");
-      //response = JSON.parse(response);
-      //$('#content').empty();
-      //$('#content').html(response.html);
-      //$('.drawing-prompt').text(response.prompt);
+    this.model.set('prompt', $('#prompt-entry').val());
+    var payload = this.model.toJSON();
+    $.post(this.model.get('route'), payload)
+      .done(function (model, response, options) {
+        console.log("Save succeeded.");
+        console.log(response);
+        //response = JSON.parse(response);
+        //$('#content').empty();
+        //$('#content').html(response.html);
+        //$('.drawing-prompt').text(response.prompt);
       })
       .fail(function (model, response, options) {
         console.log(response);
@@ -54,8 +57,8 @@ var AppRouter = Backbone.Router.extend({
 var app_router = new AppRouter();
 
 app_router.on('route:defaultRoute', function () {
-  this.subject = new Subject();
-  this.subjectView = new SubjectView({model: this.subject});
+  this.subject = new TextArea();
+  this.subjectView = new TextEntryView({model: this.subject});
   this.subjectView.render();
 });
 

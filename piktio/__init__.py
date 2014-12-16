@@ -1,5 +1,5 @@
 from pyramid.config import Configurator
-from pyramid.security import NO_PERMISSION_REQUIRED
+from pyramid.interfaces import ISessionFactory
 from sqlalchemy import engine_from_config
 
 import configure
@@ -22,7 +22,7 @@ def get_user(request):
     if user_id:
         user = DBSession.query(PiktioProfile) \
             .filter(PiktioProfile.auth_id == user_id) \
-            .first()
+            .one()
     else:
         user = None
     return user
@@ -39,6 +39,8 @@ def main(global_config, **settings):
     config = Configurator(settings=settings)
     config.include('pyramid_jinja2')
     config.include('pyramid_mako')
+    config.include('pyramid_beaker')
+    config.commit()
     config.add_jinja2_renderer('.html')
     config.add_request_method('piktio.get_user', 'user', reify=True)
     config.include('velruse.providers.facebook')

@@ -24,6 +24,7 @@ requires = [
     'WebError',
     'repoze.tm2',
     'webtest',
+    'pyramid_beaker'
     ]
 
 setup(name='piktio',
