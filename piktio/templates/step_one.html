@@ -6,8 +6,10 @@
   <h2 class="instructions">{{ instructions }}</h2>
   <textarea id="prompt-entry" rows="3" cols="42"></textarea>
   <button id="submit-text" class="t-button">Submit</button>
-</script>
 {% endraw %}
+  <input id="csrf" type="hidden" name="csrf_token" value="{{ request.session.get_csrf_token() }}">
+</script>
+
 <script type="text/javascript" src="//code.jquery.com/jquery-1.11.0.min.js"></script>
 <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.7.0/underscore-min.js"></script>
 <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone-min.js"></script>

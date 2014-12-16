@@ -13,15 +13,14 @@ var Subject = Backbone.Model.extend({
 });
 
 var SubjectView = Backbone.View.extend({
-  model: Subject,
 
   events: {
     'click button': 'submitSubject'
   },
 
   render: function () {
+    this.setElement($('#content').empty().get(0));
     $(this.el).html(textEntryTemplate(this.model.toJSON()));
-    $('#content').empty().append(this.el);
     return this;
   },
 
@@ -31,18 +30,18 @@ var SubjectView = Backbone.View.extend({
       alert("You have to type something in the entry box");
       return;
     }
-    this.model.save({'prompt': $('#prompt-entry').val()}, {
-      success: function (model, response, options) {
-        console.log("Save succeeded.");
-        //response = JSON.parse(response);
-        //$('#content').empty();
-        //$('#content').html(response.html);
-        //$('.drawing-prompt').text(response.prompt);
-      },
-      error: function (model, response, options) {
+    var payload = {'prompt': $('#prompt-entry').val(),
+               'csrf_token': $('#csrf').val()};
+    $.post('/subject', payload).done(function (model, response, options) {
+      console.log("Save succeeded.");
+      //response = JSON.parse(response);
+      //$('#content').empty();
+      //$('#content').html(response.html);
+      //$('.drawing-prompt').text(response.prompt);
+      })
+      .fail(function (model, response, options) {
         console.log(response);
-      }
-    })
+    });
   }
 });
 

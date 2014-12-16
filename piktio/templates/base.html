@@ -11,12 +11,12 @@
     <header class="cf">
       <a href="/"><h1 class="main-title">Piktio</h1></a>
       <div class="status-area">
-        {% if request.user %}
-        <p> Logged in as {{ request.user.display_name }}</p>
+        {% if user %}
+        <p> Logged in as {{ user.display_name }}</p>
         <p><a href="{{ 'apex_logout' | route_url }}">Log out</a></p>
         <!-- <p><a href="{{ 'home' | route_url }}">Show Completed Games</a></p> -->
         {% else %}
-        <a href="{{ request.route_url('apex_login') }}">Login</a>
+        <a href="{{ 'apex_login' | route_url }}">Login</a>
         {% endif %}
       </div>
     </header>

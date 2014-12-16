@@ -1,9 +1,8 @@
-from pyramid.response import Response
-from pyramid.view import view_config
+from pyramid.view import view_config, forbidden_view_config
 from pyramid.httpexceptions import HTTPFound
 from pyramid.url import route_url
-from sqlalchemy.exc import DBAPIError
 from apex.lib.flash import flash
+from pyramid.security import NO_PERMISSION_REQUIRED
 
 from .models import (
     DBSession,
@@ -16,11 +15,22 @@ from apex.lib.libapex import apex_settings, get_module, apex_remember
 from apex import MessageFactory as _
 
 
-@view_config(route_name='home', renderer='templates/step_one.html')
+@view_config(route_name='home', renderer='templates/step_one.html',
+             permission='authenticated')
 def home(request):
     context = {'user': request.user}
     return context
 
+
+@view_config(route_name='subject', renderer='json', request_method='POST',
+             permission='authenticated')
+def subject(request):
+    return {'message': 'success', 'user': request.user.display_name, 'user_id': request.user.id}
+
+
+@forbidden_view_config(renderer='json')
+def forbidden(request):
+    return {'forbidden': request.exception.message}
 
 @view_config(
     context='velruse.AuthenticationComplete',
@@ -74,21 +84,3 @@ def callback(request):
                             route_url(apex_settings('came_from_route'), request))
     flash(_('Successfully Logged in, welcome!'), 'success')
     return HTTPFound(location=redir, headers=headers)
-
-
-conn_err_msg = """\
-Pyramid is having a problem using your SQL database.  The problem
-might be caused by one of the following things:
-
-1.  You may need to run the "initialize_piktio_db" script
-    to initialize your database tables.  Check your virtual
-    environment's "bin" directory for this script and try to run it.
-
-2.  Your database server may not be running.  Check that the
-    database server referred to by the "sqlalchemy.url" setting in
-    your "development.ini" file is running.
-
-After you fix the problem, please restart the Pyramid application to
-try it again.
-"""
-

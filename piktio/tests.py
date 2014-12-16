@@ -63,3 +63,22 @@ class TestFunctionalLogin(unittest.TestCase):
         self.assertEqual(302, res.status_code)
         new_res = self.testapp.get('/')
         self.assertIn("Testy", new_res.body)
+
+    def test_post_subject(self):
+        """Test my rewrites of apex functions & forms and that login works"""
+        testuser = {}
+        testuser['password'] = "password"
+        testuser['display_name'] = "Testy"
+        with transaction.manager:
+            dumdum = NewRegisterForm(obj=testuser)
+            auth_id = create_user(username="test",
+                                  password="password",
+                                  display_name="Testy")
+            dumdum.after_signup(auth_id)
+        csrf_resp = self.testapp.get('/auth/login')
+        csrf = csrf_resp.form.fields['csrf_token'][0].value
+        res = self.testapp.post('/auth/login', {'login': 'test',
+                                                'password': 'password',
+                                                'csrf_token': csrf})
+        new_res = self.testapp.post('/subject', {'dummy': 'data'})
+        print value
