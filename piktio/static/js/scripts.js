@@ -5,7 +5,6 @@ var textEntrySource   = $("#text-entry").html();
 var textEntryTemplate = Handlebars.compile(textEntrySource);
 
 var TextArea = Backbone.Model.extend({
-  url: '/subject',
   defaults: {
     'title': 'Enter the subject of a sentence',
     'instructions': 'Like "The happy brown bear"',
@@ -26,6 +25,22 @@ var TextEntryView = Backbone.View.extend({
     return this;
   },
 
+  next_step: function (view) {
+    return function (server_response) {
+      if (typeof(server_response.error) !== 'undefined') {
+        alert(server_response.error);
+        return;
+      }
+      if (server_response.route.search('predicate') > -1) {
+        view.model.clear().set(server_response);
+        view.render();
+        return;
+      }
+      console.log('route for new thing didn\'t include predicate');
+      // Make a drawing ...
+    };
+  },
+
   submitText: function () {
     if ($('#prompt-entry').val() === "") {
       alert("You have to type something in the entry box");
@@ -34,15 +49,8 @@ var TextEntryView = Backbone.View.extend({
     this.model.set('prompt', $('#prompt-entry').val());
     var payload = this.model.toJSON();
     $.post(this.model.get('route'), payload)
-      .done(function (model, response, options) {
-        console.log("Save succeeded.");
-        console.log(response);
-        //response = JSON.parse(response);
-        //$('#content').empty();
-        //$('#content').html(response.html);
-        //$('.drawing-prompt').text(response.prompt);
-      })
-      .fail(function (model, response, options) {
+      .done(this.next_step(this))
+      .fail(function (response) {
         console.log(response);
     });
   }
@@ -62,5 +70,4 @@ app_router.on('route:defaultRoute', function () {
   this.subjectView.render();
 });
 
-// Start Backbone history a necessary step for bookmarkable URL's
 Backbone.history.start();

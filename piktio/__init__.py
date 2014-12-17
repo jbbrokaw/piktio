@@ -49,8 +49,7 @@ def main(global_config, **settings):
     # config.add_google_login_from_settings(prefix='google.')
     config.add_static_view('static', 'static', cache_max_age=3600)
     config.add_route('home', '/')
-    config.add_route('subject', '/subject', request_method='POST',
-                     permission='authenticated')
+    config.add_route('subject', '/subject')
     config.include('apex', route_prefix='/auth')
     config.scan()
     return config.make_wsgi_app()

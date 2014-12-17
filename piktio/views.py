@@ -34,21 +34,26 @@ def subject(request):
     new_game.authors.append(request.user)
     DBSession.add(new_game)
     DBSession.flush()
-    request.response_status = 201
+    request.response_status = '201 Created'  # THIS DOES NOT WORK
     next_game = DBSession.query(Game).filter(Game.predicate_id.is_(None))\
             .filter(~Game.authors.contains(request.user)).first()
     if next_game is None:
-        return {'Error': 'No suitable game for the next step'}
-    return {'title': 'Enter the subject of a sentence',
-            'instructions': 'Like "disguised himself as a raincloud to steal honey from the tree"',
-            'game_id': next_game.id
+        return {'error': 'No suitable game for the next step'}
+    instructions = 'Like "disguised himself as a raincloud ' \
+                   'to steal honey from the tree"'
+    csrf = request.session.get_csrf_token()
+    return {'title': 'Enter the predicate of a sentence',
+            'instructions': instructions,
+            'game_id': next_game.id,
+            'route': '/predicate',  # Replace this with route_url
+            'csrf_token': csrf
             }
 
 
 # Just for DEBUG, DELTE THIS FOR PRODUCTION
-@forbidden_view_config(renderer='json')
-def forbidden(request):
-    return {'forbidden': request.exception.message}
+# @forbidden_view_config(renderer='json')
+# def forbidden(request):
+#     return {'forbidden': request.exception.message}
 
 
 @view_config(
