@@ -2,11 +2,12 @@ from pyramid.view import view_config, forbidden_view_config
 from pyramid.httpexceptions import HTTPFound
 from pyramid.url import route_url
 from apex.lib.flash import flash
-from sqlalchemy.orm.exc import NoResultFound
 
 from .models import (
     DBSession,
+    copy_game_to_step,
     Subject,
+    Predicate,
     Game,
 )
 
@@ -49,6 +50,38 @@ def subject(request):
             'csrf_token': csrf
             }
 
+@view_config(route_name='predicate', renderer='json', request_method='POST',
+             permission='authenticated')
+def predicate(request):
+    new_predicate = Predicate(author=request.user.id,
+                              predicate=request.POST['prompt'])
+    DBSession.add(new_predicate)
+    DBSession.flush()
+    game = DBSession.query(Game).filter(Game.id == request.POST['game_id']).one()
+    if game.predicate_id is not None:
+        game = copy_game_to_step(game, 1)
+
+    game.predicate_id = new_predicate.id
+
+    game.authors.append(request.user)
+    DBSession.add(game)
+    DBSession.flush()
+    request.response_status = '201 Created'  # THIS DOES NOT WORK
+    next_game = DBSession.query(Game)\
+        .filter(~Game.predicate_id.is_(None))\
+        .filter(Game.first_drawing_id.is_(None))\
+        .filter(~Game.authors.contains(request.user)).first()
+    if next_game is None:
+        return {'error': 'No suitable game for the next step'}
+    instructions = " ".join([next_game.subject.subject,
+                             next_game.predicate.predicate])
+    csrf = request.session.get_csrf_token()
+    return {'title': 'Draw this sentence',
+            'instructions': instructions,
+            'game_id': next_game.id,
+            'route': '/first_drawing',  # Replace this with route_url
+            'csrf_token': csrf
+            }
 
 # Just for DEBUG, DELTE THIS FOR PRODUCTION
 # @forbidden_view_config(renderer='json')

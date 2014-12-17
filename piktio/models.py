@@ -7,17 +7,35 @@ from sqlalchemy import (
 )
 
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.ext.hybrid import hybrid_property
 
 from sqlalchemy.orm import (
     relationship,
     backref,
+    make_transient
 )
 
 from apex.models import (AuthID, DBSession)
 
 # DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
 Base = declarative_base()
+
+_STEPS = ['subject', 'predicate', 'first_drawing',
+          'first_description', 'second_drawing',
+          'second_description']
+
+
+def copy_game_to_step(game, step):
+    """Make a copy of a game object, but only up to the step
+    (integer from 1 to 6)"""
+    new_game = Game()
+    for i in xrange(step - 1):
+        attr_name = _STEPS[i] + "_id"
+        attached_object = game.__getattribute__(_STEPS[i])
+        new_game.__setattr__(attr_name, attached_object.id)
+        author = DBSession.query(PiktioProfile)\
+            .filter(PiktioProfile.id == attached_object.author).one()
+        new_game.authors.append(author)
+    return new_game
 
 follower_followee = Table(
     "follower_followee",
