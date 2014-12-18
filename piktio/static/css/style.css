@@ -89,7 +89,6 @@ a:visited {
   color: white;
   text-transform: uppercase;
   text-shadow: 0px -1px 0px #d20500;
-  transition: all .2s ease;
   transition-property: all;
   transition-duration: 0.2s;
   transition-timing-function: ease;
@@ -99,6 +98,176 @@ a:visited {
 .t-button:hover {
   cursor: pointer;
   background-color: rgb(159,28,25);
+}
+
+.canvas-box {
+  border: 1px black solid;
+  background-color: white;
+}
+
+.control-box h3 {
+  text-align: center;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 1.25em;
+  font-style: normal;
+  font-variant: normal;
+  font-weight: bold;
+  line-height: 1;
+  color: rgb(159,28,25);
+}
+
+.d-button {
+  background: #ff241f;
+  text-align: center;
+  text-decoration: none;
+  font: bold 1.25em/1 "Open Sans", sans-serif;
+  letter-spacing: 1px;
+  color: white;
+  text-transform: uppercase;
+  text-shadow: 0px -1px 0px #d20500;
+  transition-property: all;
+  transition-duration: 0.2s;
+  transition-timing-function: ease;
+  transition-delay: initial;
+}
+
+.d-button:hover {
+  background-color: rgb(159,28,25);
+}
+
+#upload:hover {
+  cursor: pointer;
+}
+
+.black {
+  background-color: black;
+  top: 0;
+  left: 0;
+}
+
+.white {
+  background-color: white;
+  top: 0;
+  left: 30px;
+}
+
+.red {
+  background-color: red;
+  top: 0;
+  left: 60px;
+}
+
+.yellow {
+  background-color: yellow;
+  top: 0;
+  left: 90px;
+  color: black;
+}
+
+.blue {
+  background-color: blue;
+  top: 0px;
+  left: 120px;
+}
+
+.aqua {
+  background-color: aqua;
+  top: 0px;
+  left: 120px;
+}
+
+.fuchsia {
+  background-color: fuchsia;
+  top: 0px;
+  left: 150px;
+}
+
+.gray {
+  background-color: gray;
+  top: 0px;
+  left: 180px;
+}
+
+.green {
+  background-color: green;
+  top: 0px;
+  left: 210px;
+}
+
+.lime {
+  background-color: lime;
+  top: 0px;
+  left: 240px;
+}
+
+.maroon {
+  background-color: maroon;
+  top: 0px;
+  left: 270px;
+}
+
+.navy {
+  background-color: navy;
+  top: 30px;
+  left: 0;
+}
+.olive {
+  background-color: olive;
+  top: 30px;
+  left: 30px;
+}
+
+.orange {
+  background-color: orange;
+  top: 30px;
+  left: 60px;
+}
+
+.purple {
+  background-color: purple;
+  top: 30px;
+  left: 90px;
+}
+
+.silver {
+  background-color: silver;
+  top: 30px;
+  left: 120px;
+}
+
+.teal {
+  background-color: teal;
+  top: 30px;
+  left: 150px;
+
+}
+
+.selected {
+  opacity: 0.5;
+  box-sizing: border-box;
+  border: 3px black solid;
+}
+
+.prev-auth-head {
+  text-align: center;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 1em;
+  font-style: normal;
+  font-variant: normal;
+  font-weight: bold;
+  line-height: 1;
+  color: rgb(159,28,25);
+}
+
+.prev-auth-list {
+  text-align: center;
+  font-family: 'Droid Serif', serif;
+  font-size: 0.8em;
+  font-style: normal;
+  font-variant: normal;
+  font-weight: bold;
+  line-height: 1;
+  color: black;
 }
 
 footer {

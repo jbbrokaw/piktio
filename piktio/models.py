@@ -10,8 +10,7 @@ from sqlalchemy.ext.declarative import declarative_base
 
 from sqlalchemy.orm import (
     relationship,
-    backref,
-    make_transient
+    backref
 )
 
 from apex.models import (AuthID, DBSession)
@@ -93,7 +92,7 @@ class Drawing(Base):
     __tablename__ = 'drawing'
     id = Column(Integer, primary_key=True)
     author_id = Column(Integer, ForeignKey(PiktioProfile.id), index=True)
-    identifier = Column(Unicode(80), nullable=True)
+    identifier = Column(Unicode(80), unique=True)
 
     author = relationship(PiktioProfile, backref='drawings')
 

@@ -42,10 +42,13 @@ def subject(request):
         return {'error': 'No suitable game for the next step'}
     instructions = 'Like "disguised himself as a raincloud ' \
                    'to steal honey from the tree"'
-    csrf = request.session.get_csrf_token()
+    csrf = request.session.new_csrf_token()
     return {'title': 'Enter the predicate of a sentence',
             'instructions': instructions,
             'game_id': next_game.id,
+            'authors': [{'id': auth.id,
+                         'display_name': auth.display_name}
+                        for auth in next_game.authors],
             'route': '/predicate',  # Replace this with route_url
             'csrf_token': csrf
             }
@@ -75,18 +78,21 @@ def predicate(request):
         return {'error': 'No suitable game for the next step'}
     instructions = " ".join([next_game.subject.subject,
                              next_game.predicate.predicate])
-    csrf = request.session.get_csrf_token()
+    csrf = request.session.new_csrf_token()
     return {'title': 'Draw this sentence',
             'instructions': instructions,
             'game_id': next_game.id,
+            'authors': [{'id': auth.id,
+                         'display_name': auth.display_name}
+                        for auth in next_game.authors],
             'route': '/first_drawing',  # Replace this with route_url
             'csrf_token': csrf
             }
 
-# Just for DEBUG, DELTE THIS FOR PRODUCTION
-# @forbidden_view_config(renderer='json')
-# def forbidden(request):
-#     return {'forbidden': request.exception.message}
+# Just for DEBUG, DELETE THIS FOR PRODUCTION
+@forbidden_view_config(renderer='json')
+def forbidden(request):
+    return {'forbidden': request.exception.message}
 
 
 @view_config(
