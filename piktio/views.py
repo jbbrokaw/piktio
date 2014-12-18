@@ -27,7 +27,7 @@ def home(request):
 @view_config(route_name='subject', renderer='json', request_method='POST',
              permission='authenticated')
 def subject(request):
-    new_subject = Subject(author=request.user.id,
+    new_subject = Subject(author_id=request.user.id,
                           subject=request.POST['prompt'])
     DBSession.add(new_subject)
     DBSession.flush()
@@ -53,7 +53,7 @@ def subject(request):
 @view_config(route_name='predicate', renderer='json', request_method='POST',
              permission='authenticated')
 def predicate(request):
-    new_predicate = Predicate(author=request.user.id,
+    new_predicate = Predicate(author_id=request.user.id,
                               predicate=request.POST['prompt'])
     DBSession.add(new_predicate)
     DBSession.flush()

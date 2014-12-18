@@ -28,12 +28,12 @@ def copy_game_to_step(game, step):
     """Make a copy of a game object, but only up to the step
     (integer from 1 to 6)"""
     new_game = Game()
-    for i in xrange(step - 1):
+    for i in xrange(step):
         attr_name = _STEPS[i] + "_id"
         attached_object = game.__getattribute__(_STEPS[i])
         new_game.__setattr__(attr_name, attached_object.id)
         author = DBSession.query(PiktioProfile)\
-            .filter(PiktioProfile.id == attached_object.author).one()
+            .filter(PiktioProfile.id == attached_object.author_id).one()
         new_game.authors.append(author)
     return new_game
 
@@ -57,7 +57,7 @@ class PiktioProfile(Base):
                              secondaryjoin=(id == follower_followee.c.follower_id),
                              backref="followees")
 
-    display_name = Column(Unicode(80))
+    display_name = Column(Unicode(72), unique=True)
 
     user = relationship(AuthID, backref=backref('profile', uselist=False))
 
@@ -65,30 +65,37 @@ class PiktioProfile(Base):
 class Subject(Base):
     __tablename__ = 'subject'
     id = Column(Integer, primary_key=True)
-    author = Column(Integer, ForeignKey(PiktioProfile.id), index=True)
+    author_id = Column(Integer, ForeignKey(PiktioProfile.id), index=True)
     subject = Column(Unicode(72))
+
+    author = relationship(PiktioProfile, backref='subjects')
 
 
 class Predicate(Base):
     __tablename__ = 'predicate'
     id = Column(Integer, primary_key=True)
-    author = Column(Integer, ForeignKey(PiktioProfile.id), index=True)
+    author_id = Column(Integer, ForeignKey(PiktioProfile.id), index=True)
     predicate = Column(Unicode(72))
+
+    author = relationship(PiktioProfile, backref='predicates')
 
 
 class Description(Base):
     __tablename__ = 'description'
     id = Column(Integer, primary_key=True)
-    author = Column(Integer, ForeignKey(PiktioProfile.id), index=True)
+    author_id = Column(Integer, ForeignKey(PiktioProfile.id), index=True)
     description = Column(Unicode(144))
+
+    author = relationship(PiktioProfile, backref='descriptions')
 
 
 class Drawing(Base):
     __tablename__ = 'drawing'
     id = Column(Integer, primary_key=True)
-    author = Column(Integer, ForeignKey(PiktioProfile.id), index=True)
+    author_id = Column(Integer, ForeignKey(PiktioProfile.id), index=True)
     identifier = Column(Unicode(80), nullable=True)
 
+    author = relationship(PiktioProfile, backref='drawings')
 
 game_authors = Table(
     'game_authors',

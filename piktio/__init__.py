@@ -1,5 +1,4 @@
 from pyramid.config import Configurator
-from pyramid.interfaces import ISessionFactory
 from sqlalchemy import engine_from_config
 
 import configure
@@ -33,9 +32,10 @@ def main(global_config, **settings):
     """
     configure.configure()
     settings = expandvars_dict(settings)
-    engine = engine_from_config(settings, 'sqlalchemy.')
-    DBSession.configure(bind=engine)
-    Base.metadata.bind = engine
+    # Letting APEX do DB stuff
+    # engine = engine_from_config(settings, 'sqlalchemy.')
+    # DBSession.configure(bind=engine)
+    # Base.metadata.bind = engine
     config = Configurator(settings=settings)
     config.include('pyramid_jinja2')
     config.include('pyramid_mako')
