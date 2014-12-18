@@ -1,13 +1,14 @@
-from pyramid.response import Response
-from pyramid.view import view_config
+from pyramid.view import view_config, forbidden_view_config
 from pyramid.httpexceptions import HTTPFound
 from pyramid.url import route_url
-from sqlalchemy.exc import DBAPIError
 from apex.lib.flash import flash
 
 from .models import (
     DBSession,
-    PiktioProfile,
+    copy_game_to_step,
+    Subject,
+    Predicate,
+    Game,
 )
 
 from apex.models import (AuthID, AuthUser, AuthGroup)
@@ -16,10 +17,76 @@ from apex.lib.libapex import apex_settings, get_module, apex_remember
 from apex import MessageFactory as _
 
 
-@view_config(route_name='home', renderer='templates/step_one.html')
+@view_config(route_name='home', renderer='templates/step_one.html',
+             permission='authenticated')
 def home(request):
     context = {'user': request.user}
     return context
+
+
+@view_config(route_name='subject', renderer='json', request_method='POST',
+             permission='authenticated')
+def subject(request):
+    new_subject = Subject(author_id=request.user.id,
+                          subject=request.POST['prompt'])
+    DBSession.add(new_subject)
+    DBSession.flush()
+    new_game = Game(subject_id=new_subject.id)
+    new_game.authors.append(request.user)
+    DBSession.add(new_game)
+    DBSession.flush()
+    request.response_status = '201 Created'  # THIS DOES NOT WORK
+    next_game = DBSession.query(Game).filter(Game.predicate_id.is_(None))\
+            .filter(~Game.authors.contains(request.user)).first()
+    if next_game is None:
+        return {'error': 'No suitable game for the next step'}
+    instructions = 'Like "disguised himself as a raincloud ' \
+                   'to steal honey from the tree"'
+    csrf = request.session.get_csrf_token()
+    return {'title': 'Enter the predicate of a sentence',
+            'instructions': instructions,
+            'game_id': next_game.id,
+            'route': '/predicate',  # Replace this with route_url
+            'csrf_token': csrf
+            }
+
+@view_config(route_name='predicate', renderer='json', request_method='POST',
+             permission='authenticated')
+def predicate(request):
+    new_predicate = Predicate(author_id=request.user.id,
+                              predicate=request.POST['prompt'])
+    DBSession.add(new_predicate)
+    DBSession.flush()
+    game = DBSession.query(Game).filter(Game.id == request.POST['game_id']).one()
+    if game.predicate_id is not None:
+        game = copy_game_to_step(game, 1)
+
+    game.predicate_id = new_predicate.id
+
+    game.authors.append(request.user)
+    DBSession.add(game)
+    DBSession.flush()
+    request.response_status = '201 Created'  # THIS DOES NOT WORK
+    next_game = DBSession.query(Game)\
+        .filter(~Game.predicate_id.is_(None))\
+        .filter(Game.first_drawing_id.is_(None))\
+        .filter(~Game.authors.contains(request.user)).first()
+    if next_game is None:
+        return {'error': 'No suitable game for the next step'}
+    instructions = " ".join([next_game.subject.subject,
+                             next_game.predicate.predicate])
+    csrf = request.session.get_csrf_token()
+    return {'title': 'Draw this sentence',
+            'instructions': instructions,
+            'game_id': next_game.id,
+            'route': '/first_drawing',  # Replace this with route_url
+            'csrf_token': csrf
+            }
+
+# Just for DEBUG, DELTE THIS FOR PRODUCTION
+# @forbidden_view_config(renderer='json')
+# def forbidden(request):
+#     return {'forbidden': request.exception.message}
 
 
 @view_config(
@@ -28,14 +95,14 @@ def home(request):
 def callback(request):
     user = None
     profile = request.context.profile
-    if not request.session.has_key('id'):
+    if 'id' not in request.session:
         user = AuthUser.get_by_login(profile['preferredUsername'])
     if not user:
-        if request.session.has_key('id'):
-            id = AuthID.get_by_id(request.session['id'])
+        if 'id' in request.session:
+            auth_id = AuthID.get_by_id(request.session['id'])
         else:
-            id = AuthID()
-            DBSession.add(id)
+            auth_id = AuthID()
+            DBSession.add(auth_id)
         user = AuthUser(
             login=profile['preferredUsername'],
             provider=request.context.provider_name,
@@ -44,7 +111,7 @@ def callback(request):
             user.email = profile['email']
         if profile.has_key('displayName'):
             user.display_name = profile['displayName']
-        id.users.append(user)
+        auth_id.users.append(user)
         DBSession.add(user)
         DBSession.flush()
         if apex_settings('default_user_group'):
@@ -52,7 +119,7 @@ def callback(request):
                     split(','):
                 group = DBSession.query(AuthGroup). \
                     filter(AuthGroup.name == name.strip()).one()
-                id.groups.append(group)
+                auth_id.groups.append(group)
         if apex_settings('create_openid_after'):
             openid_after = get_module(apex_settings('create_openid_after'))
             openid_after().after_signup(request=request, user=user)
@@ -63,7 +130,7 @@ def callback(request):
             if not getattr(user, required):
                 openid_required = True
         if openid_required:
-            request.session['id'] = id.id
+            request.session['id'] = auth_id.id
             request.session['userid'] = user.id
             return HTTPFound(location='%s?came_from=%s' %
                                       (route_url('apex_openid_required', request),
@@ -74,21 +141,3 @@ def callback(request):
                             route_url(apex_settings('came_from_route'), request))
     flash(_('Successfully Logged in, welcome!'), 'success')
     return HTTPFound(location=redir, headers=headers)
-
-
-conn_err_msg = """\
-Pyramid is having a problem using your SQL database.  The problem
-might be caused by one of the following things:
-
-1.  You may need to run the "initialize_piktio_db" script
-    to initialize your database tables.  Check your virtual
-    environment's "bin" directory for this script and try to run it.
-
-2.  Your database server may not be running.  Check that the
-    database server referred to by the "sqlalchemy.url" setting in
-    your "development.ini" file is running.
-
-After you fix the problem, please restart the Pyramid application to
-try it again.
-"""
-

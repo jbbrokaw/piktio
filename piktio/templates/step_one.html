@@ -1,14 +1,19 @@
 {% extends "base.html" %}
-{% block stylesheets %}
-<link rel="stylesheet" type="text/css" href="/static/typing.css">
-{% endblock %}
-{% block body %}
-<h1 class="section-title">Write the subject of a sentence</h1>
-<h2 class="instructions">Try to make it something fun to draw</h2>
-<textarea id="prompt-entry" rows="3" cols="42"></textarea>
-<button id="submit-text" class="t-button">Submit</button>
-{% endblock %}
 {% block scripts %}
-<script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
-<script type="text/javascript" src="/static/scripts.js"></script>
+{% raw %}
+<script id="text-entry" type="text/x-handlebars-template">
+  <h1 class="section-title">{{ title }}</h1>
+  <h2 class="instructions">{{ instructions }}</h2>
+  <textarea id="prompt-entry" rows="3" cols="42", maxlength="72"></textarea>
+  <button id="submit-text" class="t-button">Submit</button>
+{% endraw %}
+  <input id="csrf" type="hidden" name="csrf_token" value="{{ request.session.get_csrf_token() }}">
+</script>
+
+<script type="text/javascript" src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.7.0/underscore-min.js"></script>
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone-min.js"></script>
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/2.0.0/handlebars.min.js"></script>
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/fabric.js/1.4.8/fabric.min.js"></script>
+<script type="text/javascript" src="{{'piktio:static/js/scripts.js'|static_url}}"></script>
 {% endblock %}
