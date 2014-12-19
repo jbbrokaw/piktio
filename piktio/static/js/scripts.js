@@ -1,10 +1,13 @@
 /**
  * Created by jbbrokaw on 12/12/2014.
  */
-var textEntrySource   = $("#text-entry").html();
+var textEntrySource   = $("#text-entry-template").html();
 var textEntryTemplate = Handlebars.compile(textEntrySource);
 
-var TextArea = Backbone.Model.extend({
+var drawingSource = $("#drawing-template").html();
+var drawingTemplate = Handlebars.compile(drawingSource);
+
+var StepModel = Backbone.Model.extend({
   defaults: {
     'title': 'Enter the subject of a sentence',
     'instructions': 'Like "The happy brown bear"',
@@ -15,13 +18,16 @@ var TextArea = Backbone.Model.extend({
 var TextEntryView = Backbone.View.extend({
 
   events: {
-    'click button': 'submitText'
+    'click .t-button': 'submitText'
   },
 
   render: function () {
-    this.setElement($('#content').empty().get(0));
+    $('#content').empty();
     $(this.el).html(textEntryTemplate(this.model.toJSON()));
-    this.model.set('csrf_token', $('#csrf').val());
+    $('#content').append(this.el);
+    if (!this.model.has('csrf_token')) {
+      this.model.set('csrf_token', $('#csrf').val());
+    }
     return this;
   },
 
@@ -31,13 +37,16 @@ var TextEntryView = Backbone.View.extend({
         alert(server_response.error);
         return;
       }
+      view.model.clear().set(server_response);
       if (server_response.route.search('predicate') > -1) {
-        view.model.clear().set(server_response);
         view.render();
+        view.delegateEvents();
         return;
       }
-      console.log('route for new thing didn\'t include predicate');
-      // Make a drawing ...
+      view.remove();
+      view = new DrawingView({model: view.model});
+      view.render();
+      app_router.mainView = view;
     };
   },
 
@@ -46,13 +55,112 @@ var TextEntryView = Backbone.View.extend({
       alert("You have to type something in the entry box");
       return;
     }
-    this.model.set('prompt', $('#prompt-entry').val());
-    var payload = this.model.toJSON();
+    //this.model.set('prompt', $('#prompt-entry').val());
+    //var payload = this.model.toJSON();
+    var payload = {'prompt': $('#prompt-entry').val(),
+                   'game_id': this.model.get('game_id'),
+                   'csrf_token': this.model.get('csrf_token')};
     $.post(this.model.get('route'), payload)
       .done(this.next_step(this))
       .fail(function (response) {
         console.log(response);
     });
+  }
+});
+
+var DrawingView = Backbone.View.extend({
+
+  events: {
+    'click #upload': 'submitDrawing',
+    'click .color-selectors li': 'setColor',
+    'click .size-selectors .sizer': 'setSize',
+    'click #undo': 'undo',
+    'click #clear': 'clear',
+    'click #toggle-controls': 'toggleFreeDraw'
+    //'click #redo': 'redo'
+  },
+
+  render: function () {
+    $('#content').empty();
+    $(this.el).html(drawingTemplate(this.model.toJSON()));
+    $('#content').append(this.el);
+
+    this.drawingCanvas = new fabric.Canvas('drawing', {
+      isDrawingMode: true
+    });
+    this.drawingCanvas.setHeight(320);
+    this.drawingCanvas.setWidth(320);
+    fabric.Object.prototype.transparentCorners = false;
+    this.drawingCanvas.freeDrawingBrush.width = 30;
+    //this.drawingCanvas.redostack = new Array();
+
+    return this;
+  },
+
+  next_step: function (view) {
+    return function (server_response) {
+      if (typeof(server_response.error) !== 'undefined') {
+        alert(server_response.error);
+        return;
+      }
+      view.model.clear().set(server_response);
+      view.remove();
+      view = new TextEntryView({model: view.model});
+      view.render();
+      app_router.mainView = view;
+    };
+  },
+
+  setColor: function (event) {
+    $element = $(event.currentTarget);
+    this.drawingCanvas.freeDrawingBrush.color = $element.css('background-color');
+    $element.siblings().removeClass('selected');
+    $element.addClass('selected');
+  },
+
+  setSize: function (event) {
+    $sizeElement = $(event.currentTarget).children().first();
+    this.drawingCanvas.freeDrawingBrush.width = Number($sizeElement.css('height').slice(0, -2));
+    $('.sizer .selector').removeClass('selected');
+    $sizeElement.addClass('selected');
+  },
+
+  undo: function () {
+    this.drawingCanvas.remove(
+      this.drawingCanvas.getObjects().pop()
+    );
+  },
+
+  clear: function () {
+    this.drawingCanvas.clear();
+  },
+
+  submitDrawing: function () {
+    if (this.drawingCanvas.getObjects().length === 0) {
+      alert("Do not submit a blank canvas");
+      return;
+    }
+    //this.model.set('drawing', this.drawingCanvas.toDataURL('png'));
+    //var payload = this.model.toJSON();
+    var payload = {'drawing': this.drawingCanvas.toDataURL('png'),
+                   'game_id': this.model.get('game_id'),
+                   'csrf_token': this.model.get('csrf_token')};
+    this.drawingCanvas.dispose();
+    $.post(this.model.get('route'), payload)
+      .done(this.next_step(this))
+      .fail(function (response) {
+        console.log(response);
+    });
+  },
+
+  toggleFreeDraw: function (event) {
+    if (this.drawingCanvas.isDrawingMode) {
+      $(event.currentTarget).text("Draw");
+      this.drawingCanvas.isDrawingMode = false;
+    } else {
+      $(event.currentTarget).text("Edit");
+      this.drawingCanvas.isDrawingMode = true;
+    }
   }
 });
 
@@ -65,9 +173,9 @@ var AppRouter = Backbone.Router.extend({
 var app_router = new AppRouter();
 
 app_router.on('route:defaultRoute', function () {
-  this.subject = new TextArea();
-  this.subjectView = new TextEntryView({model: this.subject});
-  this.subjectView.render();
+  this.mainModel = new StepModel();
+  this.mainView = new TextEntryView({model: this.mainModel});
+  this.mainView.render();
 });
 
 Backbone.history.start();
