@@ -4,6 +4,12 @@
 <script id="text-entry-template" type="text/x-handlebars-template">
   <h1 class="section-title">{{ title }}</h1>
   <h2 class="instructions">{{ instructions }}</h2>
+  {{#if drawing }}
+  <div class="canvas-box">
+    <img src="//pikts.piktio.com/{{ drawing }}"
+        height="320" width="320"/>
+  </div>
+  {{/if }}
   <textarea id="prompt-entry" rows="3" cols="42", maxlength="72"></textarea>
   <button id="submit-text" class="t-button">Submit</button>
   {{#if game_id }}

@@ -21,7 +21,7 @@ from apex.lib.libapex import apex_settings, get_module, apex_remember
 from apex import MessageFactory as _
 
 
-@view_config(route_name='home', renderer='templates/step_one.html',
+@view_config(route_name='home', renderer='templates/gameplay.html',
              permission='authenticated')
 def home(request):
     context = {'user': request.user}
@@ -99,7 +99,7 @@ def predicate(request):
 @view_config(route_name='first_drawing', renderer='json', request_method='POST',
              permission='authenticated')
 def first_drawing(request):
-    new_drawing_id = unicode(uuid.uuid4())
+    new_drawing_id = unicode(uuid.uuid4()) + u'.png'
     upload_photo(new_drawing_id, request.POST['drawing'])
     new_drawing = Drawing(author_id=request.user.id,
                           identifier=new_drawing_id)
@@ -125,6 +125,7 @@ def first_drawing(request):
     return {'title': 'Describe this drawing',
             'instructions': 'Try to make it fun to draw',
             'game_id': next_game.id,
+            'drawing': next_game.first_drawing.identifier,
             'authors': [{'id': auth.id,
                          'display_name': auth.display_name,
                          'followed': (auth in request.user.followees)}
@@ -132,6 +133,105 @@ def first_drawing(request):
             'route': '/first_description',  # Replace this with route_url
             'csrf_token': csrf
             }
+
+
+@view_config(route_name='first_description', renderer='json', request_method='POST',
+             permission='authenticated')
+def first_description(request):
+    new_description = Description(author_id=request.user.id,
+                                  description=request.POST['prompt'])
+    DBSession.add(new_description)
+    DBSession.flush()
+    game = DBSession.query(Game).filter(Game.id == request.POST['game_id']).one()
+    if game.first_description_id is not None:
+        game = copy_game_to_step(game, 3)
+
+    game.first_description_id = new_description.id
+
+    game.authors.append(request.user)
+    DBSession.add(game)
+    DBSession.flush()
+    request.response_status = '201 Created'  # THIS DOES NOT WORK
+    next_game = DBSession.query(Game)\
+        .filter(~Game.first_description_id.is_(None))\
+        .filter(Game.second_drawing_id.is_(None))\
+        .filter(~Game.authors.contains(request.user)).first()
+    if next_game is None:
+        return {'error': 'No suitable game for the next step'}
+    csrf = request.session.new_csrf_token()
+    return {'title': 'Draw this sentence',
+            'instructions': next_game.first_description.description,
+            'game_id': next_game.id,
+            'authors': [{'id': auth.id,
+                         'display_name': auth.display_name,
+                         'followed': (auth in request.user.followees)}
+                        for auth in next_game.authors],
+            'route': '/second_drawing',  # Replace this with route_url
+            'csrf_token': csrf
+            }
+
+
+@view_config(route_name='second_drawing', renderer='json', request_method='POST',
+             permission='authenticated')
+def second_drawing(request):
+    new_drawing_id = unicode(uuid.uuid4()) + u'.png'
+    upload_photo(new_drawing_id, request.POST['drawing'])
+    new_drawing = Drawing(author_id=request.user.id,
+                          identifier=new_drawing_id)
+    DBSession.add(new_drawing)
+    DBSession.flush()
+
+    game = DBSession.query(Game).filter(Game.id == request.POST['game_id']).one()
+    if game.second_drawing_id is not None:
+        game = copy_game_to_step(game, 4)
+
+    game.second_drawing_id = new_drawing.id
+    game.authors.append(request.user)
+    DBSession.add(game)
+    DBSession.flush()
+    request.response_status = '201 Created'  # THIS DOES NOT WORK
+    next_game = DBSession.query(Game)\
+        .filter(~Game.second_drawing_id.is_(None))\
+        .filter(Game.second_description_id.is_(None))\
+        .filter(~Game.authors.contains(request.user)).first()
+    if next_game is None:
+        return {'error': 'No suitable game for the next step'}
+    csrf = request.session.new_csrf_token()
+    return {'title': 'Describe this drawing',
+            'instructions': 'Try to make it fun to draw',
+            'game_id': next_game.id,
+            'drawing': next_game.second_drawing.identifier,
+            'authors': [{'id': auth.id,
+                         'display_name': auth.display_name,
+                         'followed': (auth in request.user.followees)}
+                        for auth in next_game.authors],
+            'route': '/second_description',  # TODO: Replace this with route_url
+            'csrf_token': csrf
+            }
+
+
+@view_config(route_name='second_description', renderer='json', request_method='POST',
+             permission='authenticated')
+def second_description(request):
+    """The final step"""
+    new_description = Description(author_id=request.user.id,
+                                  description=request.POST['prompt'])
+    DBSession.add(new_description)
+    DBSession.flush()
+    game = DBSession.query(Game).filter(Game.id == request.POST['game_id']).one()
+    if game.second_description_id is not None:
+        game = copy_game_to_step(game, 5)
+
+    game.second_description_id = new_description.id
+
+    game.authors.append(request.user)
+    DBSession.add(game)
+    DBSession.flush()
+    request.response_status = '201 Created'  # THIS DOES NOT WORK
+    return {'info': 'Game completed',
+            'redirect': '/game/' + str(game.id)  # TODO: use route_url
+            }
+
 
 # Just for DEBUG, DELETE THIS FOR PRODUCTION
 # @forbidden_view_config(renderer='json')

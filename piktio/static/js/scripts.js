@@ -46,8 +46,6 @@ var TextEntryView = Backbone.View.extend({
       view.remove();
       view = new DrawingView({model: view.model});
       view.render();
-      console.log("Rendered view");
-      console.log(view);
       app_router.mainView = view;
     };
   },
@@ -105,9 +103,11 @@ var DrawingView = Backbone.View.extend({
         alert(server_response.error);
         return;
       }
-      //Make a description-entry view
-      console.log('Make a description-entry view');
-      console.log(server_response)
+      view.model.clear().set(server_response);
+      view.remove();
+      view = new TextEntryView({model: view.model});
+      view.render();
+      app_router.mainView = view;
     };
   },
 
