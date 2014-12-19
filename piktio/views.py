@@ -3,13 +3,17 @@ from pyramid.httpexceptions import HTTPFound
 from pyramid.url import route_url
 from apex.lib.flash import flash
 
-from .models import (
+from piktio.models import (
     DBSession,
     copy_game_to_step,
     Subject,
     Predicate,
+    Drawing,
+    Description,
     Game,
 )
+from piktio.storage import upload_photo
+import uuid
 
 from apex.models import (AuthID, AuthUser, AuthGroup)
 
@@ -47,7 +51,8 @@ def subject(request):
             'instructions': instructions,
             'game_id': next_game.id,
             'authors': [{'id': auth.id,
-                         'display_name': auth.display_name}
+                         'display_name': auth.display_name,
+                         'followed': (auth in request.user.followees)}
                         for auth in next_game.authors],
             'route': '/predicate',  # Replace this with route_url
             'csrf_token': csrf
@@ -83,16 +88,55 @@ def predicate(request):
             'instructions': instructions,
             'game_id': next_game.id,
             'authors': [{'id': auth.id,
-                         'display_name': auth.display_name}
+                         'display_name': auth.display_name,
+                         'followed': (auth in request.user.followees)}
                         for auth in next_game.authors],
             'route': '/first_drawing',  # Replace this with route_url
             'csrf_token': csrf
             }
 
+
+@view_config(route_name='first_drawing', renderer='json', request_method='POST',
+             permission='authenticated')
+def first_drawing(request):
+    new_drawing_id = unicode(uuid.uuid4())
+    upload_photo(new_drawing_id, request.POST['drawing'])
+    new_drawing = Drawing(author_id=request.user.id,
+                          identifier=new_drawing_id)
+    DBSession.add(new_drawing)
+    DBSession.flush()
+
+    game = DBSession.query(Game).filter(Game.id == request.POST['game_id']).one()
+    if game.first_drawing_id is not None:
+        game = copy_game_to_step(game, 2)
+
+    game.first_drawing_id = new_drawing.id
+    game.authors.append(request.user)
+    DBSession.add(game)
+    DBSession.flush()
+    request.response_status = '201 Created'  # THIS DOES NOT WORK
+    next_game = DBSession.query(Game)\
+        .filter(~Game.first_drawing_id.is_(None))\
+        .filter(Game.first_description_id.is_(None))\
+        .filter(~Game.authors.contains(request.user)).first()
+    if next_game is None:
+        return {'error': 'No suitable game for the next step'}
+    csrf = request.session.new_csrf_token()
+    return {'title': 'Describe this drawing',
+            'instructions': 'Try to make it fun to draw',
+            'game_id': next_game.id,
+            'authors': [{'id': auth.id,
+                         'display_name': auth.display_name,
+                         'followed': (auth in request.user.followees)}
+                        for auth in next_game.authors],
+            'route': '/first_description',  # Replace this with route_url
+            'csrf_token': csrf
+            }
+
 # Just for DEBUG, DELETE THIS FOR PRODUCTION
-@forbidden_view_config(renderer='json')
-def forbidden(request):
-    return {'forbidden': request.exception.message}
+# @forbidden_view_config(renderer='json')
+# def forbidden(request):
+#     return {'forbidden': request.exception.message}
 
 
 @view_config(

@@ -57,8 +57,11 @@ var TextEntryView = Backbone.View.extend({
       alert("You have to type something in the entry box");
       return;
     }
-    this.model.set('prompt', $('#prompt-entry').val());
-    var payload = this.model.toJSON();
+    //this.model.set('prompt', $('#prompt-entry').val());
+    //var payload = this.model.toJSON();
+    var payload = {'prompt': $('#prompt-entry').val(),
+                   'game_id': this.model.get('game_id'),
+                   'csrf_token': this.model.get('csrf_token')};
     $.post(this.model.get('route'), payload)
       .done(this.next_step(this))
       .fail(function (response) {
@@ -74,7 +77,9 @@ var DrawingView = Backbone.View.extend({
     'click .color-selectors li': 'setColor',
     'click .size-selectors .sizer': 'setSize',
     'click #undo': 'undo',
-    'click #clear': 'clear'
+    'click #clear': 'clear',
+    'click #toggle-controls': 'toggleFreeDraw'
+    //'click #redo': 'redo'
   },
 
   render: function () {
@@ -89,6 +94,7 @@ var DrawingView = Backbone.View.extend({
     this.drawingCanvas.setWidth(320);
     fabric.Object.prototype.transparentCorners = false;
     this.drawingCanvas.freeDrawingBrush.width = 30;
+    //this.drawingCanvas.redostack = new Array();
 
     return this;
   },
@@ -134,13 +140,27 @@ var DrawingView = Backbone.View.extend({
       alert("Do not submit a blank canvas");
       return;
     }
-    this.model.set('drawing', this.drawingCanvas.toDataURL('png'));
-    var payload = this.model.toJSON();
+    //this.model.set('drawing', this.drawingCanvas.toDataURL('png'));
+    //var payload = this.model.toJSON();
+    var payload = {'drawing': this.drawingCanvas.toDataURL('png'),
+                   'game_id': this.model.get('game_id'),
+                   'csrf_token': this.model.get('csrf_token')};
+    this.drawingCanvas.dispose();
     $.post(this.model.get('route'), payload)
       .done(this.next_step(this))
       .fail(function (response) {
         console.log(response);
     });
+  },
+
+  toggleFreeDraw: function (event) {
+    if (this.drawingCanvas.isDrawingMode) {
+      $(event.currentTarget).text("Draw");
+      this.drawingCanvas.isDrawingMode = false;
+    } else {
+      $(event.currentTarget).text("Edit");
+      this.drawingCanvas.isDrawingMode = true;
+    }
   }
 });
 

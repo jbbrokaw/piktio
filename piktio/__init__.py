@@ -51,6 +51,7 @@ def main(global_config, **settings):
     config.add_route('home', '/')
     config.add_route('subject', '/subject')
     config.add_route('predicate', '/predicate')
+    config.add_route('first_drawing', '/first_drawing')
     config.include('apex', route_prefix='/auth')
     config.scan()
     return config.make_wsgi_app()
