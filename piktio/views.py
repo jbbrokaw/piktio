@@ -21,6 +21,8 @@ from apex.models import (AuthID, AuthUser, AuthGroup)
 from apex.lib.libapex import apex_settings, get_module, apex_remember
 from apex import MessageFactory as _
 
+_ROW_LIMIT = 500
+
 
 @view_config(route_name='home', renderer='templates/gameplay.html',
              permission='authenticated')
@@ -39,14 +41,56 @@ def games(request):
 @view_config(route_name='game_list', renderer='json',
              permission='view')
 def game_list(request):
-    response = [{'id': 1}]
-    return response
+    if request.matchdict['category'] == "all":
+        completed_games = DBSession.query(Game)\
+            .filter(~Game.time_completed.is_(None))\
+            .order_by(Game.time_completed).limit(_ROW_LIMIT).all()
+        return [{'id': gm.id} for gm in completed_games]
+    if request.matchdict['category'] == "mine":
+        if request.user is None:
+            return {'error': 'please log in'}
+        my_games = DBSession.query(Game)\
+            .filter(~Game.time_completed.is_(None))\
+            .filter(Game.authors.contains(request.user))\
+            .order_by(Game.time_completed).limit(_ROW_LIMIT).all()
+        return [{'id': gm.id} for gm in my_games]
+    if request.matchdict['category'] == "friends":
+        friends_games = set()
+        for friend in request.user.followees:
+            friends_games = friends_games.union(
+                DBSession.query(Game)
+                         .filter(~Game.time_completed.is_(None))
+                         .filter(Game.authors.contains(friend))
+                         .all()
+            )
+        friends_games = list(friends_games)
+        friends_games.sort(key=lambda gm: gm.time_completed)
+        return [{'id': gm.id} for gm in friends_games]
 
 
 @view_config(route_name='game_by_id', renderer='json',
              permission='view')
 def game_by_id(request):
-    response = {'id': request.matchdict['identifier']}
+    gm = DBSession.query(Game).get(request.matchdict['identifier'])
+    response = {'id': gm.id,
+                'subject': gm.subject.subject,
+                'subject_author': gm.subject.author.display_name,
+                'predicate': gm.predicate.predicate,
+                'predicate_author': gm.predicate.author.display_name,
+                'first_drawing': gm.first_drawing.identifier,
+                'first_drawing_author':
+                    gm.first_drawing.author.display_name,
+                'first_description': gm.first_description.description,
+                'first_description_author':
+                    gm.first_description.author.display_name,
+                'second_drawing': gm.second_drawing.identifier,
+                'second_drawing_author':
+                    gm.second_drawing.author.display_name,
+                'second_description': gm.second_description.description,
+                'second_description_author':
+                    gm.second_description.author.display_name,
+                'time_completed': gm.time_completed.strftime("%m/%d/%y %H:%M")
+                }
     return response
 
 
