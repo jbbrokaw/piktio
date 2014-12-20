@@ -39,11 +39,6 @@ a:visited {
   color: rgb(255,133,0);
 }
 
-.prompt {
-  text-align: center;
-  color: rgb(255,133,0);
-}
-
 .section-title {
   text-align: center;
   font-family: 'Open Sans', sans-serif;
@@ -66,6 +61,26 @@ a:visited {
   font-weight: bold;
   line-height: 1;
   color: rgb(159,28,25);
+}
+
+.prompt {
+  text-align: center;
+  color: rgb(255,133,0);
+}
+
+.g-button {
+  background: #ff241f;
+  text-align: center;
+  text-decoration: none;
+  font: bold 1.15em/1 "Open Sans", sans-serif;
+  letter-spacing: 1px;
+  color: white;
+  text-transform: uppercase;
+  text-shadow: 0px -1px 0px #d20500;
+  transition-property: all;
+  transition-duration: 0.2s;
+  transition-timing-function: ease;
+  transition-delay: initial;
 }
 
 #prompt-entry {

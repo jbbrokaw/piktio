@@ -55,6 +55,12 @@ def main(global_config, **settings):
     config.add_route('first_description', '/first_description')
     config.add_route('second_drawing', '/second_drawing')
     config.add_route('second_description', '/second_description')
+    config.add_route('games', '/games')
+    config.add_route('game_list', '/games/{category:all|mine|friends}')
+    config.add_route(
+        'game_by_id',
+        '/games/{category:all|mine|friends}/{identifier}'
+    )
     config.include('apex', route_prefix='/auth')
     config.scan()
     return config.make_wsgi_app()

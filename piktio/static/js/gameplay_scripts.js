@@ -10,8 +10,7 @@ var drawingTemplate = Handlebars.compile(drawingSource);
 var StepModel = Backbone.Model.extend({
   defaults: {
     'title': 'Enter the subject of a sentence',
-    'instructions': 'Like "The happy brown bear"',
-    'route': '/subject'
+    'instructions': 'Like "The happy brown bear"'
   }
 });
 
@@ -28,6 +27,9 @@ var TextEntryView = Backbone.View.extend({
     if (!this.model.has('csrf_token')) {
       this.model.set('csrf_token', $('#csrf').val());
     }
+    if (!this.model.has('route')) {
+      this.model.set('route', $('#route').val());
+    }
     return this;
   },
 
@@ -36,6 +38,9 @@ var TextEntryView = Backbone.View.extend({
       if (typeof(server_response.error) !== 'undefined') {
         alert(server_response.error);
         return;
+      }
+      if (typeof(server_response.redirect) !== 'undefined') {
+        window.open(server_response.redirect, '_self');
       }
       view.model.clear().set(server_response);
       if (server_response.route.search('predicate') > -1) {

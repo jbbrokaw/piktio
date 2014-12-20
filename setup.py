@@ -26,7 +26,6 @@ requires = [
     'webtest',
     'pyramid_beaker',
     'boto',
-    'gevent'
     ]
 
 setup(name='piktio',

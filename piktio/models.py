@@ -5,7 +5,7 @@ from sqlalchemy import (
     Unicode,
     ForeignKey,
 )
-
+from sqlalchemy.types import DateTime
 from sqlalchemy.ext.declarative import declarative_base
 
 from sqlalchemy.orm import (
@@ -113,6 +113,7 @@ class Game(Base):
     first_description_id = Column(Integer, ForeignKey(Description.id), nullable=True)
     second_drawing_id = Column(Integer, ForeignKey(Drawing.id), nullable=True)
     second_description_id = Column(Integer, ForeignKey(Description.id), nullable=True)
+    time_completed = Column(DateTime, nullable=True)
 
     subject = relationship(Subject, backref="games")
     predicate = relationship(Predicate, backref="games")
