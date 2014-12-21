@@ -2,9 +2,9 @@
 # 1. Provision instance:
 #       fab provision_instance
 # 2. Update image, install packages
-#       fab install_django_haus
+#       fab install_piktio
 # 3. Setup Postgres database
-#       fab setup_haus_database
+#       fab setup_database
 # 4. Start the server
 #       fab start_server
 # For utility
@@ -24,7 +24,7 @@ import os
 # import io
 import boto
 import boto.ec2
-from piktio import credentials
+from piktio import configure
 
 env.hosts = ['localhost', ]
 env["user"] = "ubuntu"
@@ -158,16 +158,21 @@ def _install_piktio_requirements():
     if not fabric.contrib.files.exists('~/piktio/'):
         with settings(warn_only=True):
             sudo('git clone https://github.com/jbbrokaw/piktio.git')
-    sudo('ln -s /home/ubuntu/piktio/nginx.conf ' +
-         '/etc/nginx/sites-enabled/amazonaws.com')
+    if not fabric.contrib.files.exists(
+            '/etc/nginx/sites-enabled/amazonaws.com'):
+        sudo('ln -s /home/ubuntu/piktio/piktio.conf '
+             '/etc/nginx/sites-enabled/amazonaws.com')
     with cd('piktio'):
-        sudo('python setup.py install')
-        sudo('python setup.py build')
+        with settings(warn_only=True):
+            sudo('python setup.py install')
+            sudo('python setup.py install')  # WTForms takes 2 tries
+            sudo('python setup.py build')
     sudo('shutdown -r now')
+    # TODO: Setup static files, serve w/ nginx
 
 
 def _setup_database():
-    credentials.set_credentials()
+    configure.configure()
     password = os.environ['DATABASE_PASSWORD']
     create_user_command = """"
   create user piktio with password '%s';
@@ -181,11 +186,11 @@ def _setup_database():
 
 def _get_secrets():
     if not fabric.contrib.files.exists(
-            '~/piktio/piktio/credentials.py'):
+            '~/piktio/piktio/configure.py'):
         secrets_file_name = \
-            raw_input("Enter the name & path of the credentials.py file: ")
+            raw_input("Enter the name & path of the configure.py file: ")
         secrets_file_name = put(secrets_file_name, '.')[0]
-        sudo('mv %s ~/piktio/piktio/credentials.py' %
+        sudo('mv %s ~/piktio/piktio/configure.py' %
              secrets_file_name)
     if not fabric.contrib.files.exists('~/.boto'):
         secrets_file_name = \
