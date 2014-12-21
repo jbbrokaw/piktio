@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Piktio</title>
+  <link rel="stylesheet" type="text/css" href="{{'piktio:static/css/layout.css'|static_path}}">
+  <link rel="stylesheet" type="text/css" href="{{'piktio:static/css/style.css'|static_path}}">
+  {% block stylesheets %}{% endblock %}
+</head>
+<body>
+  <div class="container">
+    <header class="cf">
+      <a href="/"><h1 class="main-title">Piktio</h1></a>
+      <div class="status-area">
+        {% if user %}
+        <p> Logged in as {{ user.display_name }}</p>
+        <p><a href="{{ 'apex_logout' | route_path }}">Log out</a></p>
+        <p><a href="{{ 'games' | route_path }}">Show Completed Games</a></p>
+        {% else %}
+        <a href="{{ 'apex_login' | route_path }}">Login</a>
+        {% endif %}
+      </div>
+    </header>
+    <section id="content" class="cf">
+      {% block body %}{% endblock %}
+    </section>
+    <footer class="cf">
+      <ul class="left-footer cf">
+        <li><a href="{{ 'apex_logout' | route_path }}">Log out</a></li>
+        <!-- <p><a href="{{ 'home' | route_path }}">Show Completed Games</a></p> -->
+      </ul>
+      <a class="right-footer" href="{{ 'home' | route_path }}">Help</a>
+      <p class="center-footer">Created by Jason</p>
+    </footer>
+  </div>
+  {% block scripts %}{% endblock %}
+</body>
+</html>
