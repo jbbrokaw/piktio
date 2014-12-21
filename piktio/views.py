@@ -1,6 +1,8 @@
+import uuid
+import datetime
+
 from pyramid.view import view_config, forbidden_view_config
 from pyramid.httpexceptions import HTTPFound
-from pyramid.url import route_url
 from apex.lib.flash import flash
 
 from piktio.models import (
@@ -13,19 +15,91 @@ from piktio.models import (
     Game,
 )
 from piktio.storage import upload_photo
-import uuid
 
 from apex.models import (AuthID, AuthUser, AuthGroup)
 
 from apex.lib.libapex import apex_settings, get_module, apex_remember
 from apex import MessageFactory as _
 
+_ROW_LIMIT = 500
+
 
 @view_config(route_name='home', renderer='templates/gameplay.html',
              permission='authenticated')
 def home(request):
+    render_context = {'user': request.user}
+    return render_context
+
+
+@view_config(route_name='games', renderer='templates/games.html',
+             permission='view')
+def games(request):
+    render_context = {'user': request.user}
+    return render_context
+
+
+@view_config(route_name='game_list', renderer='json',
+             permission='view')
+def game_list(request):
+    if request.matchdict['category'] == "all":
+        completed_games = DBSession.query(Game)\
+            .filter(~Game.time_completed.is_(None))\
+            .order_by(Game.time_completed.desc()).limit(_ROW_LIMIT).all()
+        return [{'id': gm.id} for gm in completed_games]
+    if request.matchdict['category'] == "mine":
+        if request.user is None:
+            return {'error': 'please log in'}
+        my_games = DBSession.query(Game)\
+            .filter(~Game.time_completed.is_(None))\
+            .filter(Game.authors.contains(request.user))\
+            .order_by(Game.time_completed.desc()).limit(_ROW_LIMIT).all()
+        return [{'id': gm.id} for gm in my_games]
+    if request.matchdict['category'] == "friends":
+        friends_games = set()
+        for friend in request.user.followees:
+            friends_games = friends_games.union(
+                DBSession.query(Game)
+                         .filter(~Game.time_completed.is_(None))
+                         .filter(Game.authors.contains(friend))
+                         .all()
+            )
+        friends_games = list(friends_games)
+        friends_games.sort(key=lambda gm: -gm.time_completed)
+        return [{'id': gm.id} for gm in friends_games]
+
+
+@view_config(route_name='game_by_id', renderer='json',
+             permission='view')
+def game_by_id(request):
+    gm = DBSession.query(Game).get(request.matchdict['identifier'])
+    response = {'id': gm.id,
+                'subject': gm.subject.subject,
+                'subject_author': gm.subject.author.display_name,
+                'predicate': gm.predicate.predicate,
+                'predicate_author': gm.predicate.author.display_name,
+                'first_drawing': gm.first_drawing.identifier,
+                'first_drawing_author':
+                    gm.first_drawing.author.display_name,
+                'first_description': gm.first_description.description,
+                'first_description_author':
+                    gm.first_description.author.display_name,
+                'second_drawing': gm.second_drawing.identifier,
+                'second_drawing_author':
+                    gm.second_drawing.author.display_name,
+                'second_description': gm.second_description.description,
+                'second_description_author':
+                    gm.second_description.author.display_name,
+                'time_completed': gm.time_completed.strftime("%m/%d/%y %H:%M")
+                }
+    return response
+
+
+@view_config(route_name='games', renderer='templates/games.html',
+             permission='view')
+def games(request):
     context = {'user': request.user}
     return context
+
 
 
 @view_config(route_name='subject', renderer='json', request_method='POST',
@@ -39,7 +113,6 @@ def subject(request):
     new_game.authors.append(request.user)
     DBSession.add(new_game)
     DBSession.flush()
-    request.response_status = '201 Created'  # THIS DOES NOT WORK
     next_game = DBSession.query(Game).filter(Game.predicate_id.is_(None))\
             .filter(~Game.authors.contains(request.user)).first()
     if next_game is None:
@@ -54,7 +127,7 @@ def subject(request):
                          'display_name': auth.display_name,
                          'followed': (auth in request.user.followees)}
                         for auth in next_game.authors],
-            'route': '/predicate',  # Replace this with route_url
+            'route': request.route_path('predicate'),
             'csrf_token': csrf
             }
 
@@ -74,7 +147,6 @@ def predicate(request):
     game.authors.append(request.user)
     DBSession.add(game)
     DBSession.flush()
-    request.response_status = '201 Created'  # THIS DOES NOT WORK
     next_game = DBSession.query(Game)\
         .filter(~Game.predicate_id.is_(None))\
         .filter(Game.first_drawing_id.is_(None))\
@@ -91,7 +163,7 @@ def predicate(request):
                          'display_name': auth.display_name,
                          'followed': (auth in request.user.followees)}
                         for auth in next_game.authors],
-            'route': '/first_drawing',  # Replace this with route_url
+            'route': request.route_path('first_drawing'),
             'csrf_token': csrf
             }
 
@@ -114,7 +186,6 @@ def first_drawing(request):
     game.authors.append(request.user)
     DBSession.add(game)
     DBSession.flush()
-    request.response_status = '201 Created'  # THIS DOES NOT WORK
     next_game = DBSession.query(Game)\
         .filter(~Game.first_drawing_id.is_(None))\
         .filter(Game.first_description_id.is_(None))\
@@ -130,7 +201,7 @@ def first_drawing(request):
                          'display_name': auth.display_name,
                          'followed': (auth in request.user.followees)}
                         for auth in next_game.authors],
-            'route': '/first_description',  # Replace this with route_url
+            'route': request.route_path('first_description'),
             'csrf_token': csrf
             }
 
@@ -151,7 +222,6 @@ def first_description(request):
     game.authors.append(request.user)
     DBSession.add(game)
     DBSession.flush()
-    request.response_status = '201 Created'  # THIS DOES NOT WORK
     next_game = DBSession.query(Game)\
         .filter(~Game.first_description_id.is_(None))\
         .filter(Game.second_drawing_id.is_(None))\
@@ -166,7 +236,7 @@ def first_description(request):
                          'display_name': auth.display_name,
                          'followed': (auth in request.user.followees)}
                         for auth in next_game.authors],
-            'route': '/second_drawing',  # Replace this with route_url
+            'route': request.route_path('second_drawing'),
             'csrf_token': csrf
             }
 
@@ -189,7 +259,6 @@ def second_drawing(request):
     game.authors.append(request.user)
     DBSession.add(game)
     DBSession.flush()
-    request.response_status = '201 Created'  # THIS DOES NOT WORK
     next_game = DBSession.query(Game)\
         .filter(~Game.second_drawing_id.is_(None))\
         .filter(Game.second_description_id.is_(None))\
@@ -205,7 +274,7 @@ def second_drawing(request):
                          'display_name': auth.display_name,
                          'followed': (auth in request.user.followees)}
                         for auth in next_game.authors],
-            'route': '/second_description',  # TODO: Replace this with route_url
+            'route': request.route_path('second_description'),
             'csrf_token': csrf
             }
 
@@ -225,11 +294,11 @@ def second_description(request):
     game.second_description_id = new_description.id
 
     game.authors.append(request.user)
+    game.time_completed = datetime.datetime.now()
     DBSession.add(game)
     DBSession.flush()
-    request.response_status = '201 Created'  # THIS DOES NOT WORK
     return {'info': 'Game completed',
-            'redirect': '/game/' + str(game.id)  # TODO: use route_url
+            'redirect': request.route_path('games')
             }
 
 
@@ -257,9 +326,9 @@ def callback(request):
             login=profile['preferredUsername'],
             provider=request.context.provider_name,
         )
-        if profile.has_key('email'):
+        if 'email' in profile:
             user.email = profile['email']
-        if profile.has_key('displayName'):
+        if 'displayName' in profile:
             user.display_name = profile['displayName']
         auth_id.users.append(user)
         DBSession.add(user)
@@ -274,20 +343,12 @@ def callback(request):
             openid_after = get_module(apex_settings('create_openid_after'))
             openid_after().after_signup(request=request, user=user)
         DBSession.flush()
-    if apex_settings('openid_required'):
-        openid_required = False
-        for required in apex_settings('openid_required').split(','):
-            if not getattr(user, required):
-                openid_required = True
-        if openid_required:
-            request.session['id'] = auth_id.id
-            request.session['userid'] = user.id
-            return HTTPFound(location='%s?came_from=%s' %
-                                      (route_url('apex_openid_required', request),
-                                       request.GET.get('came_from',
-                                                       route_url(apex_settings('came_from_route'), request))))
     headers = apex_remember(request, user)
-    redir = request.GET.get('came_from',
-                            route_url(apex_settings('came_from_route'), request))
+    redir = request.GET.get(
+        'came_from',
+        request.route_path(
+            apex_settings('came_from_route')
+        )
+    )
     flash(_('Successfully Logged in, welcome!'), 'success')
     return HTTPFound(location=redir, headers=headers)

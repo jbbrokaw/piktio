@@ -60,6 +60,36 @@ header {
   width: 340px;
 }
 
+.game-category-box {
+  list-style: none;
+  display: block;
+  margin: auto;
+  width: 500px;
+}
+
+.g-button {
+  display: block;
+  float: left;
+  margin-top: 10px;
+  margin-left: 10px;
+  width: 100px;
+  height: 35px;
+  padding: 5px;
+  border-radius: 4px;
+}
+
+.arrow-right {
+  width: 50px;
+  border-top-right-radius: 100%;
+  border-bottom-right-radius: 100%;
+}
+
+.arrow-left {
+  width: 50px;
+  border-top-left-radius: 100%;
+  border-bottom-left-radius: 100%;
+}
+
 .section-title {
   margin: auto;
   max-width: 50%;

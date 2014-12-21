@@ -22,6 +22,7 @@
   {{/if }}
 {% endraw %}
   <input id="csrf" type="hidden" name="csrf_token" value="{{ request.session.get_csrf_token() }}">
+  <input id="route" type="hidden" name="route" value="{{ 'subject' | route_path }}">
 </script>
 {% raw %}
 <script id="drawing-template" type="text/x-handlebars-template">
@@ -79,5 +80,5 @@
 <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone-min.js"></script>
 <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/2.0.0/handlebars.min.js"></script>
 <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/fabric.js/1.4.8/fabric.min.js"></script>
-<script type="text/javascript" src="{{'piktio:static/js/scripts.js'|static_url}}"></script>
+<script type="text/javascript" src="{{'piktio:static/js/gameplay_scripts.js'|static_path}}"></script>
 {% endblock %}
