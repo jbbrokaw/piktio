@@ -99,8 +99,8 @@ class Drawing(Base):
 game_authors = Table(
     'game_authors',
     Base.metadata,
-    Column('game_id', Integer, ForeignKey('game.id')),
-    Column('author_id', Integer, ForeignKey('piktio_profile.id'))
+    Column('game_id', Integer, ForeignKey('game.id'), primary_key=True),
+    Column('author_id', Integer, ForeignKey('piktio_profile.id'), primary_key=True)
 )
 
 
@@ -113,7 +113,7 @@ class Game(Base):
     first_description_id = Column(Integer, ForeignKey(Description.id), nullable=True)
     second_drawing_id = Column(Integer, ForeignKey(Drawing.id), nullable=True)
     second_description_id = Column(Integer, ForeignKey(Description.id), nullable=True)
-    time_completed = Column(DateTime, nullable=True)
+    time_completed = Column(DateTime, nullable=True, index=True)
 
     subject = relationship(Subject, backref="games")
     predicate = relationship(Predicate, backref="games")

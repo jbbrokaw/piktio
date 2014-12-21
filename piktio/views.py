@@ -44,7 +44,7 @@ def game_list(request):
     if request.matchdict['category'] == "all":
         completed_games = DBSession.query(Game)\
             .filter(~Game.time_completed.is_(None))\
-            .order_by(Game.time_completed).limit(_ROW_LIMIT).all()
+            .order_by(Game.time_completed.desc()).limit(_ROW_LIMIT).all()
         return [{'id': gm.id} for gm in completed_games]
     if request.matchdict['category'] == "mine":
         if request.user is None:
@@ -52,7 +52,7 @@ def game_list(request):
         my_games = DBSession.query(Game)\
             .filter(~Game.time_completed.is_(None))\
             .filter(Game.authors.contains(request.user))\
-            .order_by(Game.time_completed).limit(_ROW_LIMIT).all()
+            .order_by(Game.time_completed.desc()).limit(_ROW_LIMIT).all()
         return [{'id': gm.id} for gm in my_games]
     if request.matchdict['category'] == "friends":
         friends_games = set()
@@ -64,7 +64,7 @@ def game_list(request):
                          .all()
             )
         friends_games = list(friends_games)
-        friends_games.sort(key=lambda gm: gm.time_completed)
+        friends_games.sort(key=lambda gm: -gm.time_completed)
         return [{'id': gm.id} for gm in friends_games]
 
 
@@ -298,7 +298,7 @@ def second_description(request):
     DBSession.add(game)
     DBSession.flush()
     return {'info': 'Game completed',
-            'redirect': '/games/'  # TODO: use request.route_path
+            'redirect': request.route_path('games')
             }
 
 
@@ -344,10 +344,11 @@ def callback(request):
             openid_after().after_signup(request=request, user=user)
         DBSession.flush()
     headers = apex_remember(request, user)
-    redir = request.GET.get('came_from',
-                            request.route_path(
-                                apex_settings('came_from_route'),
-                                request)
-                            )
+    redir = request.GET.get(
+        'came_from',
+        request.route_path(
+            apex_settings('came_from_route')
+        )
+    )
     flash(_('Successfully Logged in, welcome!'), 'success')
     return HTTPFound(location=redir, headers=headers)

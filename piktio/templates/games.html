@@ -1,22 +1,30 @@
 {% extends "base.html" %}
 {% block body %}
 <h1 class="section-title">Completed Games</h1>
-<input id="url-root" type="hidden" name="url-root" value="{{ 'games' }}">
+<input id="url-root" type="hidden" name="url-root" value="{{ 'games' | route_path }}">
 {% endblock %}
 {% block scripts %}
-<script id="game-template" type="text/x-handlebars-template">
+<script id="game-collection-template" type="text/x-handlebars-template">
 <h1 class="section-title">Completed Games</h1>
-<ul class="button-box cf">
-  <li id="all-games" class="g-button selected">All Games</li>
+<ul class="game-category-box cf">
+  <li class="g-button arrow-left">Older</li>
+  <li id="all-games" class="g-button g-selected">All<br />Games</li>
   {% if user %}
-  <li id="my-games" class="g-button">My Games</li>
-  <li id="friends-games" class="g-button">Friends' Games</li>
+  <li id="my-games" class="g-button">My<br />Games</li>
+  <li id="friends-games" class="g-button">Friends'<br />Games</li>
   {% endif %}
+  <li class="g-button arrow-right">Newer</li>
 </ul>
-<div id="previous" class="arrow-left">Previous</div>
+<div class="game cf"></div>
+<ul class="game-category-box cf">
+  <li class="g-button arrow-left">Older</li>
+  <a href="{{ 'home' | route_path }}"><li class="g-button">Play Again</li></a>
+  <li class="g-button arrow-right">Newer</li>
+</ul>
+</script>
+<script id="game-template" type="text/x-handlebars-template">
 {% raw %}
-<div class="game cf">
-  <h3 class="prompt"> {{ subject }}</h3>
+<h3 class="prompt"> {{ subject }}</h3>
   <p class="attribution"> {{ subject_author }}</p>
   <h3 class="prompt"> {{ predicate }}</h3>
   <p class="attribution"> {{ predicate_author }}</p>
@@ -25,6 +33,7 @@
         height="320" width="320" />
   </div>
   <p class="attribution"> {{ first_drawing_author }}</p>
+
   <h3 class="prompt">{{ first_description }}</h3>
   <p class="attribution"> {{ first_description_author }}</p>
   <div class="canvas-box">
@@ -35,14 +44,11 @@
   <h3 class="prompt">{{ second_description }}</h3>
   <p class="attribution"> {{ second_description_author }}</p>
   <p class="timestamp">Completed: {{ time_completed }}</p>
-</div>
 {% endraw %}
-<div id="next" class="arrow-right"></div>
-<h2 class="prev-auth-head"><a href="{{ 'home' | route_path }}">Play Again</a></h2>
 </script>
 <script type="text/javascript" src="//code.jquery.com/jquery-1.11.0.min.js"></script>
 <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.7.0/underscore-min.js"></script>
 <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone-min.js"></script>
 <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/2.0.0/handlebars.min.js"></script>
-<script type="text/javascript" src="{{'piktio:static/js/games_scripts.js'|static_path}}"></script>
+<script type="text/javascript" src="{{'piktio:static/js/games_scripts.js' | static_path}}"></script>
 {% endblock %}

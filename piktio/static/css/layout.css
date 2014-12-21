@@ -60,29 +60,34 @@ header {
   width: 340px;
 }
 
-.g-button {
+.game-category-box {
+  list-style: none;
   display: block;
   margin: auto;
+  width: 500px;
+}
+
+.g-button {
+  display: block;
+  float: left;
   margin-top: 10px;
-  width: 150px;
-  padding: 1em;
+  margin-left: 10px;
+  width: 100px;
+  height: 35px;
+  padding: 5px;
   border-radius: 4px;
 }
 
 .arrow-right {
-	width: 0;
-	height: 0;
-	border-top: 30px solid transparent;
-	border-bottom: 30px solid transparent;
-	border-left: 30px solid rgb(159,28,25);
+  width: 50px;
+  border-top-right-radius: 100%;
+  border-bottom-right-radius: 100%;
 }
 
 .arrow-left {
-	width: 0;
-	height: 0;
-	border-top: 30px solid transparent;
-	border-bottom: 30px solid transparent;
-	border-right: 30px solid rgb(159,28,25);
+  width: 50px;
+  border-top-left-radius: 100%;
+  border-bottom-left-radius: 100%;
 }
 
 .section-title {
