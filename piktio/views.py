@@ -101,7 +101,7 @@ def games(request):
     return context
 
 
-
+# TODO: Make these all the same route, store step & game_id in session
 @view_config(route_name='subject', renderer='json', request_method='POST',
              permission='authenticated')
 def subject(request):
