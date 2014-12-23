@@ -1,4 +1,14 @@
 {% extends "base.html" %}
+{% block body %}
+<div>
+  <h1 class="section-title">Enter the subject of a sentence</h1>
+  <h2 class="instructions">Like "The happy brown bear"</h2>
+  <textarea id="prompt-entry" rows="3" cols="42", maxlength="72"></textarea>
+  <button id="submit-text" class="t-button">Submit</button>
+  <input id="csrf" type="hidden" name="csrf_token" value="{{ request.session.get_csrf_token() }}">
+  <input id="route" type="hidden" name="route" value="{{ 'subject' | route_path }}">
+</div>
+{% endblock %}
 {% block scripts %}
 {% raw %}
 <script id="text-entry-template" type="text/x-handlebars-template">
@@ -21,8 +31,6 @@
   </p>
   {{/if }}
 {% endraw %}
-  <input id="csrf" type="hidden" name="csrf_token" value="{{ request.session.get_csrf_token() }}">
-  <input id="route" type="hidden" name="route" value="{{ 'subject' | route_path }}">
 </script>
 {% raw %}
 <script id="drawing-template" type="text/x-handlebars-template">
