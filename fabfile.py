@@ -154,6 +154,7 @@ def _install_piktio_requirements():
     sudo('apt-get -y install postgresql-server-dev-9.3')
     sudo('apt-get -y install git')
     sudo('apt-get -y install nginx')
+    sudo('pip install supervisor')
 
     if not fabric.contrib.files.exists('~/piktio/'):
         with settings(warn_only=True):
@@ -182,6 +183,8 @@ def _setup_database():
         sudo('createdb piktio', user='postgres')
     sudo('psql -U postgres piktio -c %s' % create_user_command,
          user='postgres')
+    with cd('piktio'):
+        sudo('initialize_piktio_db development.ini')
 
 
 def _get_secrets():
@@ -204,11 +207,15 @@ def _start_server():
     with cd('piktio'):
         sudo('python setup.py install')
         sudo('python setup.py build')
-    sudo('/etc/init.d/nginx restart')
-    sudo('pserve --daemon --pid-file=pserve_5000.pid '
-         'production.ini http_port=5000')
-    sudo('pserve --daemon --pid-file=pserve_5001.pid '
-         'production.ini http_port=5001')
+        sudo('/etc/init.d/nginx restart')
+        sudo('supervisord -c supervisord.conf')
+
+
+def _update_and_restart():
+    with cd('piktio'):
+        sudo('git pull origin master')
+        sudo('kill -TERM $(cat supervisord.pid)')
+    _start_server()
 
 
 @task
@@ -224,6 +231,11 @@ def setup_database():
 @task
 def start_server():
     run_command_on_selected_server(_start_server)
+
+
+@task
+def update_and_restart():
+    run_command_on_selected_server(_update_and_restart)
 
 
 @task
