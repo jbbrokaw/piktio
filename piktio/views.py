@@ -1,7 +1,8 @@
 import uuid
 import datetime
+import json
 
-from pyramid.view import view_config, forbidden_view_config
+from pyramid.view import view_config  # , forbidden_view_config
 from pyramid.httpexceptions import HTTPFound
 from apex.lib.flash import flash
 
@@ -15,6 +16,7 @@ from piktio.models import (
     Game,
 )
 from piktio.storage import upload_photo
+from piktio import serializers
 
 from apex.models import (AuthID, AuthUser, AuthGroup)
 
@@ -34,7 +36,12 @@ def home(request):
 @view_config(route_name='games', renderer='templates/games.html',
              permission='view')
 def games(request):
-    render_context = {'user': request.user}
+    completed_games = DBSession.query(Game)\
+        .filter(~Game.time_completed.is_(None))\
+        .order_by(Game.time_completed.desc()).limit(_ROW_LIMIT).all()
+    render_context = {'user': request.user,
+                      'collection': json.dumps(
+                          serializers.game_list(completed_games))}
     return render_context
 
 
@@ -45,7 +52,7 @@ def game_list(request):
         completed_games = DBSession.query(Game)\
             .filter(~Game.time_completed.is_(None))\
             .order_by(Game.time_completed.desc()).limit(_ROW_LIMIT).all()
-        return [{'id': gm.id} for gm in completed_games]
+        return serializers.game_list(completed_games)
     if request.matchdict['category'] == "mine":
         if request.user is None:
             return {'error': 'please log in'}
@@ -53,8 +60,10 @@ def game_list(request):
             .filter(~Game.time_completed.is_(None))\
             .filter(Game.authors.contains(request.user))\
             .order_by(Game.time_completed.desc()).limit(_ROW_LIMIT).all()
-        return [{'id': gm.id} for gm in my_games]
+        return serializers.game_list(my_games)
     if request.matchdict['category'] == "friends":
+        if request.user is None:
+            return {'error': 'please log in'}
         friends_games = set()
         for friend in request.user.followees:
             friends_games = friends_games.union(
@@ -65,40 +74,14 @@ def game_list(request):
             )
         friends_games = list(friends_games)
         friends_games.sort(key=lambda gm: -gm.time_completed)
-        return [{'id': gm.id} for gm in friends_games]
+        return serializers.game_list(friends_games)
 
 
 @view_config(route_name='game_by_id', renderer='json',
              permission='view')
 def game_by_id(request):
     gm = DBSession.query(Game).get(request.matchdict['identifier'])
-    response = {'id': gm.id,
-                'subject': gm.subject.subject,
-                'subject_author': gm.subject.author.display_name,
-                'predicate': gm.predicate.predicate,
-                'predicate_author': gm.predicate.author.display_name,
-                'first_drawing': gm.first_drawing.identifier,
-                'first_drawing_author':
-                    gm.first_drawing.author.display_name,
-                'first_description': gm.first_description.description,
-                'first_description_author':
-                    gm.first_description.author.display_name,
-                'second_drawing': gm.second_drawing.identifier,
-                'second_drawing_author':
-                    gm.second_drawing.author.display_name,
-                'second_description': gm.second_description.description,
-                'second_description_author':
-                    gm.second_description.author.display_name,
-                'time_completed': gm.time_completed.strftime("%m/%d/%y %H:%M")
-                }
-    return response
-
-
-@view_config(route_name='games', renderer='templates/games.html',
-             permission='view')
-def games(request):
-    context = {'user': request.user}
-    return context
+    return serializers.show_completed_game(gm)
 
 
 # TODO: Make these all the same route, store step & game_id in session
@@ -114,7 +97,7 @@ def subject(request):
     DBSession.add(new_game)
     DBSession.flush()
     next_game = DBSession.query(Game).filter(Game.predicate_id.is_(None))\
-            .filter(~Game.authors.contains(request.user)).first()
+        .filter(~Game.authors.contains(request.user)).first()
     if next_game is None:
         return {'error': 'No suitable game for the next step'}
     instructions = 'Like "disguised himself as a raincloud ' \
@@ -131,6 +114,7 @@ def subject(request):
             'csrf_token': csrf
             }
 
+
 @view_config(route_name='predicate', renderer='json', request_method='POST',
              permission='authenticated')
 def predicate(request):
@@ -138,7 +122,8 @@ def predicate(request):
                               predicate=request.POST['prompt'])
     DBSession.add(new_predicate)
     DBSession.flush()
-    game = DBSession.query(Game).filter(Game.id == request.POST['game_id']).one()
+    game = DBSession.query(Game).filter(
+        Game.id == request.POST['game_id']).one()
     if game.predicate_id is not None:
         game = copy_game_to_step(game, 1)
 
@@ -168,8 +153,8 @@ def predicate(request):
             }
 
 
-@view_config(route_name='first_drawing', renderer='json', request_method='POST',
-             permission='authenticated')
+@view_config(route_name='first_drawing', renderer='json',
+             request_method='POST', permission='authenticated')
 def first_drawing(request):
     new_drawing_id = unicode(uuid.uuid4()) + u'.png'
     upload_photo(new_drawing_id, request.POST['drawing'])
@@ -178,7 +163,8 @@ def first_drawing(request):
     DBSession.add(new_drawing)
     DBSession.flush()
 
-    game = DBSession.query(Game).filter(Game.id == request.POST['game_id']).one()
+    game = DBSession.query(Game).filter(
+        Game.id == request.POST['game_id']).one()
     if game.first_drawing_id is not None:
         game = copy_game_to_step(game, 2)
 
@@ -206,14 +192,15 @@ def first_drawing(request):
             }
 
 
-@view_config(route_name='first_description', renderer='json', request_method='POST',
-             permission='authenticated')
+@view_config(route_name='first_description', renderer='json',
+             request_method='POST', permission='authenticated')
 def first_description(request):
     new_description = Description(author_id=request.user.id,
                                   description=request.POST['prompt'])
     DBSession.add(new_description)
     DBSession.flush()
-    game = DBSession.query(Game).filter(Game.id == request.POST['game_id']).one()
+    game = DBSession.query(Game).filter(
+        Game.id == request.POST['game_id']).one()
     if game.first_description_id is not None:
         game = copy_game_to_step(game, 3)
 
@@ -241,8 +228,8 @@ def first_description(request):
             }
 
 
-@view_config(route_name='second_drawing', renderer='json', request_method='POST',
-             permission='authenticated')
+@view_config(route_name='second_drawing', renderer='json',
+             request_method='POST', permission='authenticated')
 def second_drawing(request):
     new_drawing_id = unicode(uuid.uuid4()) + u'.png'
     upload_photo(new_drawing_id, request.POST['drawing'])
@@ -251,7 +238,8 @@ def second_drawing(request):
     DBSession.add(new_drawing)
     DBSession.flush()
 
-    game = DBSession.query(Game).filter(Game.id == request.POST['game_id']).one()
+    game = DBSession.query(Game).filter(
+        Game.id == request.POST['game_id']).one()
     if game.second_drawing_id is not None:
         game = copy_game_to_step(game, 4)
 
@@ -279,15 +267,16 @@ def second_drawing(request):
             }
 
 
-@view_config(route_name='second_description', renderer='json', request_method='POST',
-             permission='authenticated')
+@view_config(route_name='second_description', renderer='json',
+             request_method='POST', permission='authenticated')
 def second_description(request):
     """The final step"""
     new_description = Description(author_id=request.user.id,
                                   description=request.POST['prompt'])
     DBSession.add(new_description)
     DBSession.flush()
-    game = DBSession.query(Game).filter(Game.id == request.POST['game_id']).one()
+    game = DBSession.query(Game).filter(
+        Game.id == request.POST['game_id']).one()
     if game.second_description_id is not None:
         game = copy_game_to_step(game, 5)
 

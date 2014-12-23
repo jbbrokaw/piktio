@@ -11,11 +11,29 @@
   <li id="all-games" class="g-button g-selected">All<br />Games</li>
   {% if user %}
   <li id="my-games" class="g-button">My<br />Games</li>
-  <li id="friends-games" class="g-button">Friends'<br />Games</li>
+  <li id="friends-games" class="g-button">Friends&#39;<br />Games</li>
   {% endif %}
   <li class="g-button arrow-right">Older</li>
 </ul>
-<div class="game cf"></div>
+<div class="game cf">
+  <h3 class="prompt">.</h3>
+    <p class="attribution">by: </p>
+    <h3 class="prompt">.</h3>
+    <p class="attribution">by: </p>
+    <div class="canvas-box">
+      <img height="320" width="320" />
+    </div>
+    <p class="attribution">by: </p>
+    <h3 class="prompt">.</h3>
+    <p class="attribution">by: </p>
+    <div class="canvas-box">
+      <img height="320" width="320" />
+    </div>
+    <p class="attribution">by: </p>
+    <h3 class="prompt">.</h3>
+    <p class="attribution">by: </p>
+    <p class="timestamp">Completed: </p>
+</div>
 <ul class="game-footer-box cf">
   <li class="g-button arrow-left">Newer</li>
   <li><a href="{{ 'home' | route_path }}" class="g-button">Play Again</a></li>
@@ -45,6 +63,9 @@
   <p class="attribution">by: {{ second_description_author }}</p>
   <p class="timestamp">Completed: {{ time_completed }}</p>
 {% endraw %}
+</script>
+<script>
+initial = {{ collection | safe }}
 </script>
 <script type="text/javascript" src="//code.jquery.com/jquery-1.11.0.min.js"></script>
 <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.7.0/underscore-min.js"></script>
