@@ -62,9 +62,18 @@ header {
 
 .game-category-box {
   list-style: none;
+  padding: 0;
   display: block;
   margin: auto;
   width: 500px;
+}
+
+.game-footer-box {
+  padding: 0;
+  list-style: none;
+  display: block;
+  margin: auto;
+  width: 260px;
 }
 
 .g-button {
@@ -82,12 +91,16 @@ header {
   width: 50px;
   border-top-right-radius: 100%;
   border-bottom-right-radius: 100%;
+  padding-top: 15px;
+  height: 25px;
 }
 
 .arrow-left {
   width: 50px;
   border-top-left-radius: 100%;
   border-bottom-left-radius: 100%;
+  padding-top: 15px;
+  height: 25px;
 }
 
 .section-title {

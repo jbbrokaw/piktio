@@ -25,12 +25,11 @@ var GameCollectionView = Backbone.View.extend({
     'click #all-games': 'allGames',
     'click #my-games': 'myGames',
     'click #friends-games': 'friendsGames',
-    'click .arrow-left': 'previousGame',
-    'click .arrow-right': 'nextGame'
+    'click .arrow-left.g-active': 'previousGame',
+    'click .arrow-right.g-active': 'nextGame'
   },
 
   render: function () {
-    console.log("Collection render");
     $(this.el).html(gameCollectionTemplate({}));
     $('#content').empty().append(this.el);
     return this;
@@ -89,7 +88,6 @@ var GameView = Backbone.View.extend({
   },
 
   render: function () {
-    console.log("Game render");
     $(this.el).html(gameTemplate(this.model.attributes));
     $('.game').empty().append(this.el);
     return this;
@@ -109,20 +107,19 @@ var AppRouter = Backbone.Router.extend({
       return this;
     }
     this.games.selected = 0;
-    console.log("Triggering selection of 0");
     this.games.trigger('selection');
   },
 
   onSelection: function () {
     if (this.games.selected <= 0) {
-      $('.arrow-left').hide();
+      $('.arrow-left').removeClass('g-active').addClass('g-inactive');
     } else {
-      $('.arrow-left').show();
+      $('.arrow-left').removeClass('g-inactive').addClass('g-active');
     }
     if (this.games.selected >= (this.games.length - 1)) {
-      $('.arrow-right').hide();
+      $('.arrow-right').removeClass('g-active').addClass('g-inactive');
     } else {
-      $('.arrow-right').show();
+      $('.arrow-right').removeClass('g-inactive').addClass('g-active');
     }
     if (typeof(this.subView) != 'undefined') {
       this.subView.remove();
