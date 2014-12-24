@@ -204,15 +204,18 @@ var AppRouter = Backbone.Router.extend({
     this.subView = new GameView({
       model: this.games.models[this.games.selected]
     });
-    if (!this.subView.model.has('time_completed')) {
-      this.subView.model.fetch({
-        success: function (model, response, options) {
-          model.trigger('gotGame');
-        }
-      });
-    } else {
+    if (this.subView.model.has('time_completed')) {
       this.subView.model.trigger('gotGame');
+      //Go ahead and load old data, although followees might be out of date
     }
+    this.subView.model.fetch({
+      //Update data in all cases
+      //(Maybe a flag could be set on follow/unfollow activity to indicate
+      //when this is necessary)
+      success: function (model, response, options) {
+        model.trigger('gotGame');
+      }
+    });
   }
 });
 
