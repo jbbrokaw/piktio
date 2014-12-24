@@ -7,6 +7,7 @@
   <button id="submit-text" class="t-button">Submit</button>
   <input id="csrf" type="hidden" name="csrf_token" value="{{ request.session.get_csrf_token() }}">
   <input id="route" type="hidden" name="route" value="{{ 'subject' | route_path }}">
+  <input id="follow-route" type="hidden" name="follow-route" value="{{ 'follow' | route_path }}">
 </div>
 {% endblock %}
 {% block scripts %}
@@ -20,15 +21,11 @@
         height="320" width="320"/>
   </div>
   {{/if }}
-  <textarea id="prompt-entry" rows="3" cols="42", maxlength="72"></textarea>
+  <textarea id="prompt-entry" rows="3" cols="42", maxlength="144"></textarea>
   <button id="submit-text" class="t-button">Submit</button>
   {{#if game_id }}
   <h3 class="prev-auth-head">Previous authors on this game:</h3>
-  <p class="prev-auth-list">
-  {{#each authors }}
-    {{ display_name }}
-  {{/each  }}
-  </p>
+  <div class="prev-auth-list cf"></div>
   {{/if }}
 {% endraw %}
 </script>
@@ -75,12 +72,12 @@
   </div>
   {{#if game_id }}
   <h3 class="prev-auth-head">Previous authors on this game:</h3>
-  <p class="prev-auth-list">
-  {{#each authors }}
-    {{ display_name }}
-  {{/each }}
-  </p>
+  <div class="prev-auth-list"></div>
   {{/if }}
+</script>
+<script id="user-template" type="text/x-handlebars-template">
+  <p>{{ display_name }}</p>
+  <p>Follow: <span class="f-button"></span></p>
 </script>
 {% endraw %}
 <script type="text/javascript" src="//code.jquery.com/jquery-1.11.0.min.js"></script>

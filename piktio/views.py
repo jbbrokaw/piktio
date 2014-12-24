@@ -14,6 +14,7 @@ from piktio.models import (
     Drawing,
     Description,
     Game,
+    PiktioProfile
 )
 from piktio.storage import upload_photo
 from piktio import serializers
@@ -41,7 +42,7 @@ def games(request):
         .order_by(Game.time_completed.desc()).limit(_ROW_LIMIT).all()
     render_context = {'user': request.user,
                       'collection': json.dumps(
-                          serializers.game_list(completed_games))}
+                          serializers.game_list(completed_games, request))}
     return render_context
 
 
@@ -52,7 +53,7 @@ def game_list(request):
         completed_games = DBSession.query(Game)\
             .filter(~Game.time_completed.is_(None))\
             .order_by(Game.time_completed.desc()).limit(_ROW_LIMIT).all()
-        return serializers.game_list(completed_games)
+        return serializers.game_list(completed_games, request)
     if request.matchdict['category'] == "mine":
         if request.user is None:
             return {'error': 'please log in'}
@@ -60,7 +61,7 @@ def game_list(request):
             .filter(~Game.time_completed.is_(None))\
             .filter(Game.authors.contains(request.user))\
             .order_by(Game.time_completed.desc()).limit(_ROW_LIMIT).all()
-        return serializers.game_list(my_games)
+        return serializers.game_list(my_games, request)
     if request.matchdict['category'] == "friends":
         if request.user is None:
             return {'error': 'please log in'}
@@ -73,15 +74,28 @@ def game_list(request):
                          .all()
             )
         friends_games = list(friends_games)
-        friends_games.sort(key=lambda gm: -gm.time_completed)
-        return serializers.game_list(friends_games)
+        friends_games.sort(key=lambda gm: gm.time_completed)
+        friends_games.reverse()
+        return serializers.game_list(friends_games, request)
+
+
+@view_config(route_name='follow', renderer='json', request_method='POST',
+             permission='authenticated')
+def follow(request):
+    followee = DBSession.query(PiktioProfile).get(request.POST['id'])
+    if (request.POST['followed'] == "true") \
+            and (followee in request.user.followees):
+        request.user.followees.remove(followee)
+    if request.POST['followed'] == "false":
+        request.user.followees.append(followee)
+    return serializers.author(followee, request)
 
 
 @view_config(route_name='game_by_id', renderer='json',
              permission='view')
 def game_by_id(request):
     gm = DBSession.query(Game).get(request.matchdict['identifier'])
-    return serializers.show_completed_game(gm)
+    return serializers.show_completed_game(gm, request)
 
 
 # TODO: Make these all the same route, store step & game_id in session
@@ -106,9 +120,7 @@ def subject(request):
     return {'title': 'Enter the predicate of a sentence',
             'instructions': instructions,
             'game_id': next_game.id,
-            'authors': [{'id': auth.id,
-                         'display_name': auth.display_name,
-                         'followed': (auth in request.user.followees)}
+            'authors': [serializers.author(auth, request)
                         for auth in next_game.authors],
             'route': request.route_path('predicate'),
             'csrf_token': csrf
@@ -144,9 +156,7 @@ def predicate(request):
     return {'title': 'Draw this sentence',
             'instructions': instructions,
             'game_id': next_game.id,
-            'authors': [{'id': auth.id,
-                         'display_name': auth.display_name,
-                         'followed': (auth in request.user.followees)}
+            'authors': [serializers.author(auth, request)
                         for auth in next_game.authors],
             'route': request.route_path('first_drawing'),
             'csrf_token': csrf
@@ -183,9 +193,7 @@ def first_drawing(request):
             'instructions': 'Try to make it fun to draw',
             'game_id': next_game.id,
             'drawing': next_game.first_drawing.identifier,
-            'authors': [{'id': auth.id,
-                         'display_name': auth.display_name,
-                         'followed': (auth in request.user.followees)}
+            'authors': [serializers.author(auth, request)
                         for auth in next_game.authors],
             'route': request.route_path('first_description'),
             'csrf_token': csrf
@@ -219,9 +227,7 @@ def first_description(request):
     return {'title': 'Draw this sentence',
             'instructions': next_game.first_description.description,
             'game_id': next_game.id,
-            'authors': [{'id': auth.id,
-                         'display_name': auth.display_name,
-                         'followed': (auth in request.user.followees)}
+            'authors': [serializers.author(auth, request)
                         for auth in next_game.authors],
             'route': request.route_path('second_drawing'),
             'csrf_token': csrf
@@ -258,9 +264,7 @@ def second_drawing(request):
             'instructions': 'Try to make it fun to draw',
             'game_id': next_game.id,
             'drawing': next_game.second_drawing.identifier,
-            'authors': [{'id': auth.id,
-                         'display_name': auth.display_name,
-                         'followed': (auth in request.user.followees)}
+            'authors': [serializers.author(auth, request)
                         for auth in next_game.authors],
             'route': request.route_path('second_description'),
             'csrf_token': csrf

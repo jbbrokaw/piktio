@@ -3,8 +3,10 @@
  */
 var gameCollectionSource = $("#game-collection-template").html();
 var gameSource = $("#game-template").html();
+var userSource = $('#user-template').html();
 var gameCollectionTemplate = Handlebars.compile(gameCollectionSource);
 var gameTemplate = Handlebars.compile(gameSource);
+var userTemplate = Handlebars.compile(userSource);
 
 
 var GameModel = Backbone.Model.extend({});
@@ -17,6 +19,13 @@ var GameCollection = Backbone.Collection.extend({
 
   url: function () {
     return this.urlBase + '/' + this.group;
+  }
+});
+
+var UserModel = Backbone.Model.extend({
+  defaults: {
+    'csrf_token': $('#csrf').val(),
+    'route': $('#follow-route').val()
   }
 });
 
@@ -90,10 +99,78 @@ var GameView = Backbone.View.extend({
   render: function () {
     $(this.el).html(gameTemplate(this.model.attributes));
     $('.game').empty().append(this.el);
+
+    var subAuthView = new UserView({
+      model: new UserModel(this.model.get('subject_author')),
+      el: $('.subject')[0]
+    });
+    subAuthView.render();
+
+    var predAuthView = new UserView({
+      model: new UserModel(this.model.get('predicate_author')),
+      el: $('.predicate')[0]
+    });
+    predAuthView.render();
+
+    var firstDrawAuthView = new UserView({
+      model: new UserModel(this.model.get('first_drawing_author')),
+      el: $('.first_drawing')[0]
+    });
+    firstDrawAuthView.render();
+
+    var firstDescAuthView = new UserView({
+      model: new UserModel(this.model.get('first_description_author')),
+      el: $('.first_description')[0]
+    });
+    firstDescAuthView.render();
+
+    var secDrawAuthView = new UserView({
+      model: new UserModel(this.model.get('second_drawing_author')),
+      el: $('.second_drawing')[0]
+    });
+    secDrawAuthView.render();
+
+    var secDescAuthView = new UserView({
+      model: new UserModel(this.model.get('second_description_author')),
+      el: $('.second_description')[0]
+    });
+    secDescAuthView.render();
+
     return this;
   }
 });
 
+var UserView = Backbone.View.extend({
+  events: {
+    'click .f-button': 'follow',
+  },
+
+  render: function () {
+    $(this.el).empty().html(userTemplate(this.model.attributes));
+    if (this.model.get('followed')) {
+      $(this.el).children('p').children('.f-button').text('☑');
+    } else {
+      $(this.el).children('p').children('.f-button').text('☐');
+    }
+  },
+
+  follow: function () {
+    console.log("Following");
+    console.log(this.model.attributes);
+    $.post(this.model.get('route'), this.model.attributes)
+      .done(this.followDone(this))
+      .fail(function (response) {
+        console.log(response);
+      });
+  },
+
+  followDone: function (view) {
+    return function (server_response) {
+      view.model.set(server_response);
+      view.render();
+    };
+  }
+});
 
 var AppRouter = Backbone.Router.extend({
   routes: {
@@ -127,15 +204,18 @@ var AppRouter = Backbone.Router.extend({
     this.subView = new GameView({
       model: this.games.models[this.games.selected]
     });
-    if (!this.subView.model.has('time_completed')) {
-      this.subView.model.fetch({
-        success: function (model, response, options) {
-          model.trigger('gotGame');
-        }
-      });
-    } else {
+    if (this.subView.model.has('time_completed')) {
       this.subView.model.trigger('gotGame');
+      //Go ahead and load old data, although followees might be out of date
     }
+    this.subView.model.fetch({
+      //Update data in all cases
+      //(Maybe a flag could be set on follow/unfollow activity to indicate
+      //when this is necessary)
+      success: function (model, response, options) {
+        model.trigger('gotGame');
+      }
+    });
   }
 });
 
