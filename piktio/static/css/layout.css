@@ -147,6 +147,12 @@ a.g-button {
   height: 320px;
 }
 
+.author-box {
+  float: left;
+  display: inline-block;
+  width: 50px;
+}
+
 .control-box {
   position: relative;
   margin: auto;

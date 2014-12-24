@@ -44,4 +44,5 @@ def game_list(games, request):
 def author(author, request):
     return {'id': author.id,
             'display_name': author.display_name,
-            'followed': (author in request.user.followees)}
+            'followed': (author in request.user.followees),
+            'csrf_token': request.session.get_csrf_token()}

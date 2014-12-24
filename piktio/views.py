@@ -83,7 +83,11 @@ def game_list(request):
              permission='authenticated')
 def follow(request):
     followee = DBSession.query(PiktioProfile).get(request.POST['id'])
-    request.user.followees.append(followee)
+    if (request.POST['followed'] == "true") \
+            and (followee in request.user.followees):
+        request.user.followees.remove(followee)
+    if request.POST['followed'] == "false":
+        request.user.followees.append(followee)
     return serializers.author(followee, request)
 
 
