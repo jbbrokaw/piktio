@@ -84,6 +84,10 @@ a:visited {
   transition-delay: initial;
 }
 
+a.g-button {
+  color: white;
+}
+
 .g-selected {
   opacity: 0.5;
 }
@@ -92,12 +96,27 @@ a:visited {
   opacity: 0.1;
 }
 
-.attribution {
-  margin-top: 0;
-  margin-bottom: 15px;
+.attribution p {
+  margin: 0;
   font-size: 8pt;
   text-align: right;
   color: rgb(159,28,25);
+}
+
+.f-button {
+  padding: 2px;
+  border-radius: 20%;
+  background-color: #ff241f;
+  color: white;
+  transition-property: all;
+  transition-duration: 0.2s;
+  transition-timing-function: ease;
+  transition-delay: initial;
+}
+
+.f-button:hover {
+  cursor: pointer;
+  background-color: rgb(159,28,25);
 }
 
 .timestamp {

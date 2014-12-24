@@ -103,6 +103,11 @@ header {
   height: 25px;
 }
 
+a.g-button {
+  padding-top: 15px;
+  height: 25px;
+}
+
 .section-title {
   margin: auto;
   max-width: 50%;
