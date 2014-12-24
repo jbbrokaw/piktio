@@ -1,4 +1,5 @@
 from apex.forms import RegisterForm
+from apex.lib.form import ExtendedForm
 
 from piktio.models import PiktioProfile, DBSession
 from apex.models import AuthID, AuthUser, AuthGroup
@@ -66,3 +67,8 @@ class NewRegisterForm(RegisterForm):
                            display_name=self.data['display_name'],
                            group=group)
         return user
+
+
+class DisplayNameForm(ExtendedForm):
+    display_name = StringField(_('Display Name'), [validators.DataRequired(),
+                               validators.Length(min=4, max=25)])

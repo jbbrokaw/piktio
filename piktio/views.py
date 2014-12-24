@@ -17,6 +17,7 @@ from piktio.models import (
     PiktioProfile
 )
 from piktio.storage import upload_photo
+from piktio.forms import DisplayNameForm
 from piktio import serializers
 
 from apex.models import (AuthID, AuthUser, AuthGroup)
@@ -345,3 +346,22 @@ def callback(request):
     )
     flash(_('Successfully Logged in, welcome!'), 'success')
     return HTTPFound(location=redir, headers=headers)
+
+
+@view_config(route_name='change_name', renderer='templates/forms.html',
+             permission='authenticated')
+def change_name(request):
+    form = DisplayNameForm(
+        request.POST,
+        captcha={'ip_address': request.environ['REMOTE_ADDR']}
+    )
+
+    if request.method == 'POST' and form.validate():
+        request.user.display_name = form.data['display_name']
+        # TODO: This might not be unique. probably figure that out
+        # in form.validate()
+        return HTTPFound(location=request.route_path('home'))
+
+    return {'title': 'Change your display name',
+            'user': request.user,
+            'form': form}
