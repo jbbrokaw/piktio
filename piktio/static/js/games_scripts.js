@@ -127,11 +127,15 @@ var AppRouter = Backbone.Router.extend({
     this.subView = new GameView({
       model: this.games.models[this.games.selected]
     });
-    this.subView.model.fetch({
-      success: function (model, response, options) {
-        model.trigger('gotGame');
-      }
-    });
+    if (!this.subView.model.has('time_completed')) {
+      this.subView.model.fetch({
+        success: function (model, response, options) {
+          model.trigger('gotGame');
+        }
+      });
+    } else {
+      this.subView.model.trigger('gotGame');
+    }
   }
 });
 
@@ -143,11 +147,8 @@ app_router.on('route:defaultRoute', function () {
   this.mainView.render();
   this.listenTo(this.games, "load", this.onCollectionLoad);
   this.listenTo(this.games, "selection", this.onSelection);
-  this.games.fetch({
-    success: function (model, response, options) {
-      model.trigger('load');
-    }
-  });
+  this.games.reset(initial);
+  this.games.trigger('load');
 });
 
 Backbone.history.start();
