@@ -1,3 +1,10 @@
+{% macro apex_flash() -%}
+{%- for flash in flash.get_all() %}
+    <div class="alert-message {{ flash['queue'] }}">
+        <p>{{ flash['message'] }}</p>
+    </div>
+{%- endfor -%}
+{% endmacro %}
 <!DOCTYPE html>
 <html>
 <head>
@@ -12,7 +19,8 @@
       <a href="/"><h1 class="main-title">Piktio</h1></a>
       <div class="status-area">
         {% if user %}
-        <p> Logged in as {{ user.display_name }}</p>
+        <p> Logged in as </p>
+        <p>{{ user.display_name }} (<a href="{{ 'change_name' | route_path }}">change</a>)</p>
         <p><a href="{{ 'apex_logout' | route_path }}">Log out</a></p>
         <p><a href="{{ 'games' | route_path }}">Show Completed Games</a></p>
         {% else %}

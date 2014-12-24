@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block body %}
+{{ apex_flash() }}
+<h1 class="section-title"> {{ title }} </h1>
+{{ form.render() | safe }}
+<div class="prev-auth-list cf">
+  {% if (action != 'login') %}
+  <a href="{{ 'apex_login' | route_path }}">Login</a>
+  {% endif %}
+  {% if (action != 'register') %}
+  <a href="{{ 'apex_register' | route_path }}">Create an Account</a>
+  {% endif %}
+  {% if (action != 'forgot') %}
+  <a href="{{ 'apex_forgot' | route_path }}">Forgot my Password</a>
+  {% endif %}
+</div>
+{% endblock %}
