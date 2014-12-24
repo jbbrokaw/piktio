@@ -265,7 +265,7 @@ a.g-button {
 .prev-auth-list {
   display: block;
   margin: auto;
-  max-width: 50%;
+  max-width: 320px;
 }
 
 footer {
