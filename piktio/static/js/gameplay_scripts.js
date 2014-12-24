@@ -9,8 +9,8 @@ var drawingTemplate = Handlebars.compile(drawingSource);
 
 var StepModel = Backbone.Model.extend({
   defaults: {
-    'title': 'Enter the subject of a sentence',
-    'instructions': 'Like "The happy brown bear"'
+    'csrf_token': $('#csrf').val(),
+    'route': $('#route').val()
   }
 });
 
@@ -24,12 +24,6 @@ var TextEntryView = Backbone.View.extend({
     $('#content').empty();
     $(this.el).html(textEntryTemplate(this.model.toJSON()));
     $('#content').append(this.el);
-    if (!this.model.has('csrf_token')) {
-      this.model.set('csrf_token', $('#csrf').val());
-    }
-    if (!this.model.has('route')) {
-      this.model.set('route', $('#route').val());
-    }
     return this;
   },
 
@@ -180,7 +174,7 @@ var app_router = new AppRouter();
 app_router.on('route:defaultRoute', function () {
   this.mainModel = new StepModel();
   this.mainView = new TextEntryView({model: this.mainModel});
-  this.mainView.render();
+  $('.t-button').on('click', $.proxy(this.mainView.submitText, this.mainView));
 });
 
 Backbone.history.start();
