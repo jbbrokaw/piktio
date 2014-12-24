@@ -1,11 +1,9 @@
 from pyramid.config import Configurator
-from sqlalchemy import engine_from_config
 
 import configure
 import os
 from piktio.models import (
     DBSession,
-    Base,
     PiktioProfile
 )
 
@@ -62,6 +60,7 @@ def main(global_config, **settings):
         '/games/{category:all|mine|friends}/{identifier}'
     )
     config.add_route('follow', '/follow')
+    config.add_route('change_name', '/display_name')
     config.include('apex', route_prefix='/auth')
     config.scan()
     return config.make_wsgi_app()

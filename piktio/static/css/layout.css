@@ -34,6 +34,23 @@ header {
   min-height: 10%;
 }
 
+table {
+  margin: auto;
+  margin-bottom: 10px;
+}
+
+form {
+  width: 320px;
+  text-align: center;
+  margin: auto;
+  margin-top: 20px;
+}
+
+.alert-message {
+  width: 320px;
+  margin: auto;
+}
+
 .main-title {
   display: block;
   float: left;
