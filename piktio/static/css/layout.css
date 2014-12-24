@@ -103,6 +103,11 @@ header {
   height: 25px;
 }
 
+a.g-button {
+  padding-top: 15px;
+  height: 25px;
+}
+
 .section-title {
   margin: auto;
   max-width: 50%;
@@ -140,6 +145,12 @@ header {
 #drawing {
   width: 320px;
   height: 320px;
+}
+
+.author-box {
+  float: left;
+  display: inline-block;
+  width: 50px;
 }
 
 .control-box {
@@ -254,7 +265,7 @@ header {
 .prev-auth-list {
   display: block;
   margin: auto;
-  max-width: 50%;
+  max-width: 320px;
 }
 
 footer {

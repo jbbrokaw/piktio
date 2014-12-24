@@ -61,6 +61,7 @@ def main(global_config, **settings):
         'game_by_id',
         '/games/{category:all|mine|friends}/{identifier}'
     )
+    config.add_route('follow', '/follow')
     config.include('apex', route_prefix='/auth')
     config.scan()
     return config.make_wsgi_app()

@@ -3,9 +3,11 @@
  */
 var textEntrySource   = $("#text-entry-template").html();
 var textEntryTemplate = Handlebars.compile(textEntrySource);
-
+var userSource = $('#user-template').html();
 var drawingSource = $("#drawing-template").html();
 var drawingTemplate = Handlebars.compile(drawingSource);
+var userTemplate = Handlebars.compile(userSource);
+
 
 var StepModel = Backbone.Model.extend({
   defaults: {
@@ -13,6 +15,14 @@ var StepModel = Backbone.Model.extend({
     'route': $('#route').val()
   }
 });
+
+var UserModel = Backbone.Model.extend({
+  defaults: {
+    'csrf_token': $('#csrf').val(),
+    'route': $('#follow-route').val()
+  }
+});
+
 
 var TextEntryView = Backbone.View.extend({
 
@@ -24,6 +34,13 @@ var TextEntryView = Backbone.View.extend({
     $('#content').empty();
     $(this.el).html(textEntryTemplate(this.model.toJSON()));
     $('#content').append(this.el);
+    _.each(this.model.get('authors'), function (author) {
+      aView = new UserView({
+        model: new UserModel(author)
+      });
+      aView.render();
+      $('.prev-auth-list').append(aView.el);
+    });
     return this;
   },
 
@@ -92,6 +109,14 @@ var DrawingView = Backbone.View.extend({
     fabric.Object.prototype.transparentCorners = false;
     this.drawingCanvas.freeDrawingBrush.width = 30;
     //this.drawingCanvas.redostack = new Array();
+
+    _.each(this.model.get('authors'), function (author) {
+      aView = new UserView({
+        model: new UserModel(author)
+      });
+      aView.render();
+      $('.prev-auth-list').append(aView.el);
+    });
 
     return this;
   },
@@ -162,6 +187,39 @@ var DrawingView = Backbone.View.extend({
     }
   }
 });
+
+var UserView = Backbone.View.extend({
+  className: 'author-box',
+
+  events: {
+    'click .f-button': 'follow',
+  },
+
+  render: function () {
+    $(this.el).empty().html(userTemplate(this.model.attributes));
+    if (this.model.get('followed')) {
+      $(this.el).children('p').children('.f-button').text('☑');
+    } else {
+      $(this.el).children('p').children('.f-button').text('☐');
+    }
+  },
+
+  follow: function () {
+    $.post(this.model.get('route'), this.model.attributes)
+      .done(this.followDone(this))
+      .fail(function (response) {
+        console.log(response);
+      });
+  },
+
+  followDone: function (view) {
+    return function (server_response) {
+      view.model.set(server_response);
+      view.render();
+    };
+  }
+});
+
 
 var AppRouter = Backbone.Router.extend({
   routes: {
