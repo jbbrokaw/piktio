@@ -72,6 +72,13 @@ form {
   position: relative;
 }
 
+.gameplay-area {
+  box-sizing: border-box;
+  margin: auto;
+  width: 320px;
+  padding: 1.5em;
+}
+
 .game {
   margin: auto;
   width: 340px;
@@ -137,8 +144,10 @@ a.g-button {
 }
 
 #prompt-entry {
+  box-sizing: border-box;
+  width: 16em;
+  padding: 1.5em;
   display: block;
-  margin: auto;
   margin-top: 2em;
   border: 1px black solid;
 }

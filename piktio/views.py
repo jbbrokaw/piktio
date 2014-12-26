@@ -358,8 +358,6 @@ def change_name(request):
 
     if request.method == 'POST' and form.validate():
         request.user.display_name = form.data['display_name']
-        # TODO: This might not be unique. probably figure that out
-        # in form.validate()
         return HTTPFound(location=request.route_path('home'))
 
     return {'title': 'Change your display name',

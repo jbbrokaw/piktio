@@ -1,6 +1,13 @@
 @import url(//fonts.googleapis.com/css?family=Open+Sans:400italic,800italic,400,800);
 @import url(//fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic,700italic);
 
+@font-face {
+    font-family:'Always Forever';
+    src: url('/static/always_forever.ttf');
+    font-style:normal
+}
+
+
 header {
   background-color: rgb(5, 171, 235);
 }
@@ -111,6 +118,10 @@ input[type="submit"]:hover {
   margin-bottom: 5px;
 }
 
+.gameplay-area {
+  background-image: url('/static/lined_paper_blank.png');
+}
+
 .g-button {
   background: #ff241f;
   text-align: center;
@@ -184,10 +195,8 @@ a.g-button {
 }
 
 #prompt-entry {
-  background-color: white;
-  width: 320px;
-  padding: 1px;
-  font-family: 'Open Sans', sans-serif;
+  background-color: transparent;
+  font-family: 'Always Forever', sans-serif;
   font-size: 1em;
   font-style: normal;
   font-variant: normal;
