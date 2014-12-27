@@ -76,6 +76,7 @@ form {
   box-sizing: border-box;
   margin: auto;
   width: 320px;
+  height: 414px;
   padding: 1.5em;
 }
 
@@ -144,8 +145,7 @@ a.g-button {
 }
 
 #prompt-entry {
-  box-sizing: border-box;
-  width: 16em;
+  width: 8.5em;
   padding: 1.5em;
   display: block;
   margin-top: 2em;

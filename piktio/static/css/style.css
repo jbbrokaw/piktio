@@ -120,6 +120,7 @@ input[type="submit"]:hover {
 
 .gameplay-area {
   background-image: url('/static/lined_paper_blank.png');
+  background-position: bottom;
 }
 
 .g-button {
@@ -197,7 +198,7 @@ a.g-button {
 #prompt-entry {
   background-color: transparent;
   font-family: 'Always Forever', sans-serif;
-  font-size: 1em;
+  font-size: 1.5em;
   font-style: normal;
   font-variant: normal;
   font-weight: bold;
