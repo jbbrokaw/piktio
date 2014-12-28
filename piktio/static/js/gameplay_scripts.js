@@ -150,16 +150,25 @@ var DrawingView = Backbone.View.extend({
   },
 
   next_step: function (view) {
+    var reRender = function () {
+      //Make it wait for animation to be done.
+      if (!animationDone) {
+        setTimeout(reRender, 50);
+        return;
+      }
+      view.remove();
+      view = new TextEntryView({model: view.model});
+      view.render();
+      app_router.mainView = view;
+    };
+
     return function (server_response) {
       if (typeof(server_response.error) !== 'undefined') {
         alert(server_response.error);
         return;
       }
       view.model.clear().set(server_response);
-      view.remove();
-      view = new TextEntryView({model: view.model});
-      view.render();
-      app_router.mainView = view;
+      reRender();
     };
   },
 
@@ -192,6 +201,23 @@ var DrawingView = Backbone.View.extend({
       alert("Do not submit a blank canvas");
       return;
     }
+    animationDone = false;
+    targ = $('.gameplay-area').height() - $('.animated-section').height();
+    $('.animated-section').css('border', 'none')
+      .animate(
+        {'height': 0,
+         'padding-top': 0,
+         'padding-bottom': 0,
+         'margin-top': 0,
+         'margin-bottom': 0
+        },
+        1000,
+        function () {
+          $(this).hide();
+          animationDone = true;
+        }
+      );
+    $('.gameplay-area').animate({'height': targ}, 1000);
     //this.model.set('drawing', this.drawingCanvas.toDataURL('png'));
     //var payload = this.model.toJSON();
     var payload = {'drawing': this.drawingCanvas.toDataURL('png'),
