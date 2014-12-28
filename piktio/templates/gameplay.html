@@ -3,7 +3,7 @@
 <div>
   <h1 class="section-title">Enter the subject of a sentence</h1>
   <h2 class="instructions">Like "The happy brown bear"</h2>
-  <div class="gameplay-area">
+  <div class="gameplay-area cf">
     <textarea id="prompt-entry" rows="3" cols="42", maxlength="72"></textarea>
   </div>
   <button id="submit-text" class="t-button">Submit</button>
@@ -17,7 +17,7 @@
 <script id="text-entry-template" type="text/x-handlebars-template">
   <h1 class="section-title">{{ title }}</h1>
   <h2 class="instructions">{{ instructions }}</h2>
-  <div class="gameplay-area">
+  <div class="gameplay-area cf">
     {{#if drawing }}
     <div class="canvas-box">
       <img src="//pikts.piktio.com/{{ drawing }}"
@@ -36,7 +36,7 @@
 {% raw %}
 <script id="drawing-template" type="text/x-handlebars-template">
   <h1 class="section-title">{{ title }}</h1>
-  <div class="gameplay-area">
+  <div class="gameplay-area cf">
     <h2 class="instructions">{{ instructions }}</h2>
     <div class="canvas-box">
       <canvas id="drawing"></canvas>

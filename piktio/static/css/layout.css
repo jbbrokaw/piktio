@@ -75,9 +75,9 @@ form {
 .gameplay-area {
   box-sizing: border-box;
   margin: auto;
-  width: 320px;
-  height: 414px;
-  padding: 1.5em;
+  width: 350px;
+  height: 550px;
+  padding: 0;
 }
 
 .game {
@@ -144,11 +144,18 @@ a.g-button {
   padding: 1em;
 }
 
+.gameplay-area .instructions {
+  margin: auto;
+  max-width: 80%;
+  padding: 0.5em;
+}
+
 #prompt-entry {
   width: 8.5em;
   padding: 1.5em;
   display: block;
-  margin-top: 2em;
+  margin: auto;
+  margin-top: 1.5em;
   border: 1px black solid;
 }
 
@@ -163,8 +170,8 @@ a.g-button {
 
 .canvas-box {
   margin: auto;
-  width: 320px;
-  height: 320px;
+  width: 324px;
+  height: 324px;
   padding: 1px;
 }
 

@@ -103,6 +103,7 @@ def game_by_id(request):
 @view_config(route_name='subject', renderer='json', request_method='POST',
              permission='authenticated')
 def subject(request):
+    # TODO: For all text entries, strip out carriage returns
     new_subject = Subject(author_id=request.user.id,
                           subject=request.POST['prompt'])
     DBSession.add(new_subject)

@@ -112,6 +112,15 @@ input[type="submit"]:hover {
   color: rgb(159,28,25);
 }
 
+.gameplay-area .instructions {
+  font-family: 'Always Forever', sans-serif;
+  font-size: 1.5em;
+  font-style: normal;
+  font-variant: normal;
+  font-weight: bold;
+  line-height: 1;
+}
+
 .prompt {
   text-align: center;
   color: rgb(255,133,0);
@@ -227,7 +236,7 @@ a.g-button {
 
 .canvas-box {
   border: 1px black solid;
-  background-color: white;
+  background-color: transparent;
 }
 
 .control-box h3 {
