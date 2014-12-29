@@ -170,6 +170,23 @@ a.g-button {
   width: 50px;
 }
 
+.social-login {
+  width: 220px;
+  height: 50px;
+  margin: auto;
+}
+.social-login form table {
+  visibility: hidden;
+  height: 12px;
+  margin: 0px;
+}
+
+.social-login form {
+  width: 100px;
+  float: left;
+  margin: 0;
+}
+
 .control-box {
   position: relative;
   margin: auto;
