@@ -3,6 +3,14 @@
 {{ apex_flash() }}
 <h1 class="section-title"> {{ title }} </h1>
 {{ form.render() | safe }}
+{% if velruse_forms %}
+  {% for provider_form in velruse_forms %}
+	{{ provider_form.render(
+      action='/velruse/login/%s' % provider_form.provider_name,
+      submit_text=provider_form.provider_proper_name)
+    | safe }}
+  {%  endfor %}
+{% endif %}
 <div class="prev-auth-list cf">
   {% if (action != 'login') %}
   <a href="{{ 'apex_login' | route_path }}">Login</a>

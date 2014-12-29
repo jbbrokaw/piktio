@@ -50,7 +50,7 @@ label {
   color: rgb(159,28,25);
 }
 
-input[type="submit"] {
+input[value="Submit"] {
   background: #ff241f;
   text-align: center;
   text-decoration: none;
@@ -65,10 +65,89 @@ input[type="submit"] {
   transition-delay: initial;
 }
 
-input[type="submit"]:hover {
+input[value="Submit"]:hover {
   cursor: pointer;
   background-color: rgb(159,28,25);
 }
+
+input[value="Facebook"],
+input[value="Facebook"]:visited {
+    position: relative;
+    display: inline-block;
+    height: 22px;
+    padding: 0 1em;
+    border: 1px solid #999;
+    border-radius: 2px;
+    margin: 0;
+    text-align: center;
+    text-decoration: none;
+    font-size: 14px;
+    line-height: 22px;
+    white-space: nowrap;
+    cursor: pointer;
+    color: #222;
+    background: #fff;
+    -webkit-box-sizing: content-box;
+    -moz-box-sizing: content-box;
+    box-sizing: content-box;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    /* iOS */
+    -webkit-appearance: none; /* 1 */
+    /* IE6/7 hacks */
+    *overflow: visible;  /* 2 */
+    *display: inline; /* 3 */
+    *zoom: 1; /* 3 */
+}
+
+input[value="Facebook"]:hover,
+input[value="Facebook"]:focus,
+input[value="Facebook"]:active {
+    color: #222;
+    text-decoration: none;
+}
+
+/*
+ * Remove excess padding and border in FF3+
+ */
+
+input[value="Facebook"]::-moz-focus-inner {
+    border: 0;
+    padding: 0;
+}
+
+
+input[value="Facebook"],
+input[value="Facebook"]:visited {
+    border-color: #29447e;
+    border-bottom-color: #1a356e;
+    color: #fff;
+    background-color: #5872a7;
+    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#637bad), to(#5872a7));
+    background-image: -webkit-linear-gradient(#637bad, #5872a7);
+    background-image: -moz-linear-gradient(#637bad, #5872a7);
+    background-image: -ms-linear-gradient(#637bad, #5872a7);
+    background-image: -o-linear-gradient(#637bad, #5872a7);
+    background-image: linear-gradient(#637bad, #5872a7);
+    -webkit-box-shadow: inset 0 1px 0 #879ac0;
+    box-shadow: inset 0 1px 0 #879ac0;
+}
+
+input[value="Facebook"]:hover,
+input[value="Facebook"]:focus {
+    color: #fff;
+    background-color: #3b5998;
+}
+
+input[value="Facebook"]:active {
+    color: #fff;
+    background: #4f6aa3;
+    -webkit-box-shadow: inset 0 1px 0 #45619d;
+    box-shadow: inset 0 1px 0 #45619d;
+}
+
 
 .alert-message p {
   text-align: center;
