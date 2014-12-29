@@ -4,7 +4,7 @@ from apex.lib.form import ExtendedForm
 from piktio.models import PiktioProfile, DBSession
 from apex.models import AuthID, AuthUser, AuthGroup
 from apex import MessageFactory as _
-from wtforms import StringField, validators
+from wtforms import StringField, validators, ValidationError
 from sqlalchemy.orm.exc import NoResultFound
 
 
@@ -33,7 +33,9 @@ def create_user(**kwargs):
 
     if 'group' in kwargs:
         try:
-            group = DBSession.query(AuthGroup).filter(AuthGroup.name == kwargs['group']).one()
+            group = DBSession.query(AuthGroup).filter(
+                AuthGroup.name == kwargs['group']
+            ).one()
             auth_id.groups.append(group)
         except NoResultFound:
             pass
@@ -54,7 +56,10 @@ class NewRegisterForm(RegisterForm):
                                validators.Length(min=4, max=25)])
 
     def after_signup(self, user, request=None):
-        profile = PiktioProfile(auth_id=user.auth_id, display_name=user.display_name)
+        profile = PiktioProfile(
+            auth_id=user.auth_id,
+            display_name=user.display_name
+        )
         DBSession.add(profile)
         DBSession.flush()
 
@@ -72,3 +77,10 @@ class NewRegisterForm(RegisterForm):
 class DisplayNameForm(ExtendedForm):
     display_name = StringField(_('Display Name'), [validators.DataRequired(),
                                validators.Length(min=4, max=25)])
+
+    def validate_display_name(form, field):
+        existing_owners = DBSession.query(PiktioProfile).filter(
+            PiktioProfile.display_name == field.data
+        ).all()
+        if existing_owners:
+            raise ValidationError("Sorry, that name is taken")

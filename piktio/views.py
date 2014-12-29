@@ -103,6 +103,7 @@ def game_by_id(request):
 @view_config(route_name='subject', renderer='json', request_method='POST',
              permission='authenticated')
 def subject(request):
+    # TODO: For all text entries, strip out carriage returns
     new_subject = Subject(author_id=request.user.id,
                           subject=request.POST['prompt'])
     DBSession.add(new_subject)
@@ -358,8 +359,6 @@ def change_name(request):
 
     if request.method == 'POST' and form.validate():
         request.user.display_name = form.data['display_name']
-        # TODO: This might not be unique. probably figure that out
-        # in form.validate()
         return HTTPFound(location=request.route_path('home'))
 
     return {'title': 'Change your display name',
