@@ -320,8 +320,8 @@ def callback(request):
             login=profile['preferredUsername'],
             provider=request.context.provider_name,
         )
-        if 'email' in profile:
-            user.email = profile['email']
+        if 'verifiedEmail' in profile:
+            user.email = profile['verifiedEmail']
         if 'displayName' in profile:
             user.display_name = profile['displayName']
         auth_id.users.append(user)
