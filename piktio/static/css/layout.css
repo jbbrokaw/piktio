@@ -22,6 +22,11 @@ html,body {
   min-height:100%; /* needed for container min-height */
 }
 
+.animated-section {
+  position: relative;
+  height: 400px;
+}
+
 .container {
   position: relative;
   height: auto;
@@ -148,6 +153,8 @@ a.g-button {
   margin: auto;
   max-width: 80%;
   padding: 0.5em;
+  position: absolute;
+  bottom: 324px;
 }
 
 #prompt-entry {
@@ -173,6 +180,8 @@ a.g-button {
   width: 324px;
   height: 324px;
   padding: 1px;
+  position: absolute;
+  bottom: 0;
 }
 
 #drawing {

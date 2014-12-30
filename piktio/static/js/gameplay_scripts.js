@@ -156,6 +156,7 @@ var DrawingView = Backbone.View.extend({
         setTimeout(reRender, 50);
         return;
       }
+      view.drawingCanvas.dispose();
       view.remove();
       view = new TextEntryView({model: view.model});
       view.render();
@@ -203,14 +204,7 @@ var DrawingView = Backbone.View.extend({
     }
     animationDone = false;
     targ = $('.gameplay-area').height() - $('.animated-section').height();
-    $('.animated-section').css('border', 'none')
-      .animate(
-        {'height': 0,
-         'padding-top': 0,
-         'padding-bottom': 0,
-         'margin-top': 0,
-         'margin-bottom': 0
-        },
+    $('.animated-section').slideUp(
         1000,
         function () {
           $(this).hide();
@@ -218,12 +212,10 @@ var DrawingView = Backbone.View.extend({
         }
       );
     $('.gameplay-area').animate({'height': targ}, 1000);
-    //this.model.set('drawing', this.drawingCanvas.toDataURL('png'));
-    //var payload = this.model.toJSON();
+
     var payload = {'drawing': this.drawingCanvas.toDataURL('png'),
                    'game_id': this.model.get('game_id'),
                    'csrf_token': this.model.get('csrf_token')};
-    this.drawingCanvas.dispose();
     $.post(this.model.get('route'), payload)
       .done(this.next_step(this))
       .fail(function (response) {
