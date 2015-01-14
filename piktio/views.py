@@ -325,6 +325,7 @@ def callback(request):
             user.email = profile['verifiedEmail']
         if 'displayName' in profile:
             user.display_name = profile['displayName']
+            # TODO: This may not be unique, handle the error here.
         auth_id.users.append(user)
         DBSession.add(user)
         DBSession.flush()
