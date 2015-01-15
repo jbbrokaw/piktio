@@ -3,7 +3,11 @@
 <div>
   <h1 class="section-title">Enter the subject of a sentence</h1>
   <h2 class="instructions">Like "The happy brown bear"</h2>
-  <textarea id="prompt-entry" rows="3" cols="42", maxlength="72"></textarea>
+  <div class="gameplay-area cf">
+    <div class="animated-section">
+      <textarea id="prompt-entry" class="top" rows="3" cols="42", maxlength="72"></textarea>
+    </div>
+  </div>
   <button id="submit-text" class="t-button">Submit</button>
   <input id="csrf" type="hidden" name="csrf_token" value="{{ request.session.get_csrf_token() }}">
   <input id="route" type="hidden" name="route" value="{{ 'subject' | route_path }}">
@@ -15,13 +19,19 @@
 <script id="text-entry-template" type="text/x-handlebars-template">
   <h1 class="section-title">{{ title }}</h1>
   <h2 class="instructions">{{ instructions }}</h2>
-  {{#if drawing }}
-  <div class="canvas-box">
-    <img src="//pikts.piktio.com/{{ drawing }}"
-        height="320" width="320"/>
+  <div class="gameplay-area cf">
+    <div class="animated-section">
+      {{#if drawing }}
+      <div class="canvas-box top">
+        <img src="//pikts.piktio.com/{{ drawing }}"
+            height="320" width="320"/>
+      </div>
+      <textarea id="prompt-entry" class="bottom" rows="3" cols="42", maxlength="144"></textarea>
+      {{ else }}
+      <textarea id="prompt-entry" class="top"  rows="3" cols="42", maxlength="144"></textarea>
+      {{/if }}
+    </div>
   </div>
-  {{/if }}
-  <textarea id="prompt-entry" rows="3" cols="42", maxlength="144"></textarea>
   <button id="submit-text" class="t-button">Submit</button>
   {{#if game_id }}
   <h3 class="prev-auth-head">Previous authors on this game:</h3>
@@ -32,9 +42,13 @@
 {% raw %}
 <script id="drawing-template" type="text/x-handlebars-template">
   <h1 class="section-title">{{ title }}</h1>
-  <h2 class="instructions">{{ instructions }}</h2>
-  <div class="canvas-box">
-    <canvas id="drawing"></canvas>
+  <div class="gameplay-area cf">
+    <div class="animated-section">
+      <h2 class="instructions top">{{ instructions }}</h2>
+      <div class="canvas-box bottom">
+        <canvas id="drawing"></canvas>
+      </div>
+    </div>
   </div>
   <div class="control-box cf">
     <ul class="button-box cf">
@@ -42,7 +56,6 @@
       <li id="clear" class="d-button">Clear</li>
       <li id="toggle-controls" class="d-button">Edit</li>
       <li id="upload" class="d-button">Upload</li>
-
     </ul>
     <ul class="size-selectors cf">
       <li class="sizer"><div class="selector huge selected"><div></li>
