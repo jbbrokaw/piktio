@@ -83,18 +83,10 @@ var TextEntryView = Backbone.View.extend({
       return;
     }
     animationDone = false;
-    targ = $('.gameplay-area').height() - $('#prompt-entry').height();
-    $('#prompt-entry').css('border', 'none')
-      .animate(
-        {'height': 0,
-         'padding-top': 0,
-         'padding-bottom': 0,
-         'margin-top': 0,
-         'margin-bottom': 0
-        },
+    targ = $('.gameplay-area').height() - $('.animated-section').height();
+    $('.animated-section').slideUp(
         1000,
         function () {
-          $(this).hide();
           animationDone = true;
         }
       );

@@ -24,7 +24,7 @@ html,body {
 
 .animated-section {
   position: relative;
-  height: 400px;
+  height: 550px;
 }
 
 .container {
@@ -81,7 +81,7 @@ form {
   box-sizing: border-box;
   margin: auto;
   width: 350px;
-  height: 550px;
+  height: 700px;
   padding: 0;
 }
 
@@ -149,7 +149,7 @@ a.g-button {
   padding: 1em;
 }
 
-.gameplay-area .instructions {
+.animated-section .instructions {
   margin: auto;
   max-width: 80%;
   padding: 0.5em;
@@ -166,6 +166,18 @@ a.g-button {
   border: 1px black solid;
 }
 
+#prompt-entry.top {
+  position: absolute;
+  bottom: 350px;
+  left: 25px;
+}
+
+#prompt-entry.bottom {
+  position: absolute;
+  left: 25px;
+  bottom: 10px;
+}
+
 .t-button {
   display: block;
   margin: auto;
@@ -180,8 +192,16 @@ a.g-button {
   width: 324px;
   height: 324px;
   padding: 1px;
+}
+
+.canvas-box.bottom {
   position: absolute;
-  bottom: 0;
+  bottom: 0px;
+}
+
+.canvas-box.top {
+  position: absolute;
+  bottom: 200px;
 }
 
 #drawing {
