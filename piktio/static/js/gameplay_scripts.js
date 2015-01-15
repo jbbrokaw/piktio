@@ -7,6 +7,7 @@ var userSource = $('#user-template').html();
 var drawingSource = $("#drawing-template").html();
 var drawingTemplate = Handlebars.compile(drawingSource);
 var userTemplate = Handlebars.compile(userSource);
+var animationDone = true;
 
 
 var StepModel = Backbone.Model.extend({
@@ -45,16 +46,14 @@ var TextEntryView = Backbone.View.extend({
   },
 
   next_step: function (view) {
-    return function (server_response) {
-      if (typeof(server_response.error) !== 'undefined') {
-        alert(server_response.error);
+    var reRender = function () {
+      //Make it wait for animation to be done.
+      if (!animationDone) {
+        setTimeout(reRender, 50);
         return;
       }
-      if (typeof(server_response.redirect) !== 'undefined') {
-        window.open(server_response.redirect, '_self');
-      }
-      view.model.clear().set(server_response);
-      if (server_response.route.search('predicate') > -1) {
+
+      if (view.model.get('route').search('predicate') > -1) {
         view.render();
         view.delegateEvents();
         return;
@@ -64,6 +63,18 @@ var TextEntryView = Backbone.View.extend({
       view.render();
       app_router.mainView = view;
     };
+
+    return function (server_response) {
+      if (typeof(server_response.error) !== 'undefined') {
+        alert(server_response.error);
+        return;
+      }
+      if (typeof(server_response.redirect) !== 'undefined') {
+        window.open(server_response.redirect, '_self');
+      }
+      view.model.clear().set(server_response);
+      reRender();
+    };
   },
 
   submitText: function () {
@@ -71,6 +82,15 @@ var TextEntryView = Backbone.View.extend({
       alert("You have to type something in the entry box");
       return;
     }
+    animationDone = false;
+    targ = $('.gameplay-area').height() - $('.animated-section').height();
+    $('.animated-section').slideUp(
+        1000,
+        function () {
+          animationDone = true;
+        }
+      );
+    $('.gameplay-area').animate({'height': targ}, 1000);
     //this.model.set('prompt', $('#prompt-entry').val());
     //var payload = this.model.toJSON();
     var payload = {'prompt': $('#prompt-entry').val(),
@@ -122,16 +142,26 @@ var DrawingView = Backbone.View.extend({
   },
 
   next_step: function (view) {
+    var reRender = function () {
+      //Make it wait for animation to be done.
+      if (!animationDone) {
+        setTimeout(reRender, 50);
+        return;
+      }
+      view.drawingCanvas.dispose();
+      view.remove();
+      view = new TextEntryView({model: view.model});
+      view.render();
+      app_router.mainView = view;
+    };
+
     return function (server_response) {
       if (typeof(server_response.error) !== 'undefined') {
         alert(server_response.error);
         return;
       }
       view.model.clear().set(server_response);
-      view.remove();
-      view = new TextEntryView({model: view.model});
-      view.render();
-      app_router.mainView = view;
+      reRender();
     };
   },
 
@@ -164,12 +194,20 @@ var DrawingView = Backbone.View.extend({
       alert("Do not submit a blank canvas");
       return;
     }
-    //this.model.set('drawing', this.drawingCanvas.toDataURL('png'));
-    //var payload = this.model.toJSON();
+    animationDone = false;
+    targ = $('.gameplay-area').height() - $('.animated-section').height();
+    $('.animated-section').slideUp(
+        1000,
+        function () {
+          $(this).hide();
+          animationDone = true;
+        }
+      );
+    $('.gameplay-area').animate({'height': targ}, 1000);
+
     var payload = {'drawing': this.drawingCanvas.toDataURL('png'),
                    'game_id': this.model.get('game_id'),
                    'csrf_token': this.model.get('csrf_token')};
-    this.drawingCanvas.dispose();
     $.post(this.model.get('route'), payload)
       .done(this.next_step(this))
       .fail(function (response) {
