@@ -511,6 +511,10 @@ a.g-button {
   border: 3px black solid;
 }
 
+.sizer-selected {
+  background-color: white;
+}
+
 .prev-auth-head {
   text-align: center;
   font-family: 'Open Sans', sans-serif;

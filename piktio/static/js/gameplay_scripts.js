@@ -167,7 +167,9 @@ var DrawingView = Backbone.View.extend({
 
   setColor: function (event) {
     $element = $(event.currentTarget);
-    this.drawingCanvas.freeDrawingBrush.color = $element.css('background-color');
+    selectedColor = $element.css('background-color');
+    this.drawingCanvas.freeDrawingBrush.color = selectedColor;
+    $('.sizer .selector').css('background-color', selectedColor);
     $element.siblings().removeClass('selected');
     $element.addClass('selected');
   },
@@ -176,6 +178,8 @@ var DrawingView = Backbone.View.extend({
     $sizeElement = $(event.currentTarget).children().first();
     this.drawingCanvas.freeDrawingBrush.width = Number($sizeElement.css('height').slice(0, -2));
     $('.sizer .selector').removeClass('selected');
+    $('.sizer').removeClass('sizer-selected');
+    $sizeElement.parent().addClass('sizer-selected');
     $sizeElement.addClass('selected');
   },
 
