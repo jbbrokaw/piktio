@@ -81,8 +81,10 @@ form {
   box-sizing: border-box;
   margin: auto;
   width: 350px;
-  height: 700px;
-  padding: 0;
+  min-height: 100px;
+  padding: 1em;
+  padding-top: 0;
+  padding-bottom: 0;
 }
 
 .game {
@@ -196,12 +198,12 @@ a.g-button {
 
 .canvas-box.bottom {
   position: absolute;
-  bottom: 0px;
+  bottom: 5px;
 }
 
 .canvas-box.top {
   position: absolute;
-  bottom: 200px;
+  bottom: 205px;
 }
 
 #drawing {
@@ -223,7 +225,7 @@ a.g-button {
 .social-login form table {
   visibility: hidden;
   height: 12px;
-  margin: 0px;
+  margin: 0;
 }
 
 .social-login form {

@@ -9,7 +9,7 @@
 
 
 header {
-  background-color: rgb(5, 171, 235);
+  background-color: #233854;
 }
 
 .main-title {
@@ -25,7 +25,7 @@ header {
 }
 
 .container {
-  background-color: rgb(190, 236, 254);
+  background-color: #385A87;
 }
 
 a {
@@ -39,11 +39,11 @@ p {
 }
 
 a:hover {
-  color: rgb(255,36,31);
+  color: #578DD4;
 }
 
 a:visited {
-  color: rgb(255,133,0);
+  color: #5F88BF;
 }
 
 label {
@@ -54,18 +54,18 @@ label {
   font-variant: normal;
   font-weight: bold;
   line-height: 1;
-  color: rgb(159,28,25);
+  color: #6E829B;
 }
 
 input[value="Submit"] {
-  background: #ff241f;
+  background: #6E829B;
   text-align: center;
   text-decoration: none;
   font: bold 0.85em/1 "Open Sans", sans-serif;
   letter-spacing: 1px;
   color: white;
   text-transform: uppercase;
-  text-shadow: 0px -1px 0px #d20500;
+  text-shadow: 0px -1px 0px #5F88BF;
   transition-property: all;
   transition-duration: 0.2s;
   transition-timing-function: ease;
@@ -74,7 +74,7 @@ input[value="Submit"] {
 
 input[value="Submit"]:hover {
   cursor: pointer;
-  background-color: rgb(159,28,25);
+  background-color: #233854;
 }
 
 input[value="Facebook"],
@@ -197,11 +197,11 @@ input[value="Google"]:active {
   text-align: center;
   font: bold 0.85em/1 "Open Sans", sans-serif;
   letter-spacing: 1px;
-  color: rgb(255,36,31)
+  color: white
 }
 
 .prev-auth-list a {
-  color: rgb(255,36,31)
+  color: white
 }
 
 .section-title {
@@ -212,7 +212,7 @@ input[value="Google"]:active {
   font-variant: normal;
   font-weight: bold;
   line-height: 1;
-  color: rgb(255,36,31);
+  color: white;
   text-transform: uppercase;
   letter-spacing: -2px;
 }
@@ -225,7 +225,7 @@ input[value="Google"]:active {
   font-variant: normal;
   font-weight: bold;
   line-height: 1;
-  color: rgb(159,28,25);
+  color: #578DD4;
 }
 
 .gameplay-area .instructions {
@@ -239,7 +239,7 @@ input[value="Google"]:active {
 
 .prompt {
   text-align: center;
-  color: rgb(255,133,0);
+  color: #578DD4;
   margin-bottom: 5px;
   font-family: 'Always Forever', sans-serif;
   font-size: 1.5em;
@@ -260,14 +260,14 @@ input[value="Google"]:active {
 }
 
 .g-button {
-  background: #ff241f;
+  background: #6E829B;
   text-align: center;
   text-decoration: none;
   font: bold 0.85em/1 "Open Sans", sans-serif;
   letter-spacing: 1px;
   color: white;
   text-transform: uppercase;
-  text-shadow: 0px -1px 0px #d20500;
+  text-shadow: 0px -1px 0px #5F88BF;
   transition-property: all;
   transition-duration: 0.2s;
   transition-timing-function: ease;
@@ -290,19 +290,19 @@ a.g-button {
   margin: 0;
   font-size: 8pt;
   text-align: right;
-  color: rgb(159,28,25);
+  color: #578DD4;
 }
 
 .author-box p {
   margin: 0;
   font-size: 8pt;
-  color: rgb(159,28,25);
+  color: #5F88BF;
 }
 
 .f-button {
   padding: 2px;
   border-radius: 20%;
-  background-color: #ff241f;
+  background-color: #6E829B;
   color: white;
   transition-property: all;
   transition-duration: 0.2s;
@@ -312,26 +312,27 @@ a.g-button {
 
 .f-button:hover {
   cursor: pointer;
-  background-color: rgb(159,28,25);
+  background-color: #5F88BF;
 }
 
 .timestamp {
   font-size: 8pt;
   text-align: right;
-  color: rgb(159,28,25);
+  color: #5F88BF;
 }
 
 .g-button:hover {
   cursor: pointer;
-  background-color: rgb(159,28,25);
+  background-color: #5F88BF;
 }
 
 .g-inactive:hover {
   cursor: inherit;
-  background-color: #ff241f;
+  background-color: #6E829B;
 }
 
 #prompt-entry {
+  color: #578DD4;
   background-color: transparent;
   font-family: 'Always Forever', sans-serif;
   font-size: 1.5em;
@@ -342,14 +343,14 @@ a.g-button {
 }
 
 .t-button {
-  background: #ff241f;
+  background: #6E829B;
   text-align: center;
   text-decoration: none;
   font: bold 1.15em/1 "Open Sans", sans-serif;
   letter-spacing: 1px;
   color: white;
   text-transform: uppercase;
-  text-shadow: 0px -1px 0px #d20500;
+  text-shadow: 0px -1px 0px #5F88BF;
   transition-property: all;
   transition-duration: 0.2s;
   transition-timing-function: ease;
@@ -358,7 +359,7 @@ a.g-button {
 
 .t-button:hover {
   cursor: pointer;
-  background-color: rgb(159,28,25);
+  background-color: #5F88BF;
 }
 
 .canvas-box {
@@ -374,18 +375,18 @@ a.g-button {
   font-variant: normal;
   font-weight: bold;
   line-height: 1;
-  color: rgb(159,28,25);
+  color: #5F88BF;
 }
 
 .d-button {
-  background: #ff241f;
+  background: #6E829B;
   text-align: center;
   text-decoration: none;
   font: bold 1.15em/1 "Open Sans", sans-serif;
   letter-spacing: 1px;
   color: white;
   text-transform: uppercase;
-  text-shadow: 0px -1px 0px #d20500;
+  text-shadow: 0px -1px 0px #5F88BF;
   transition-property: all;
   transition-duration: 0.2s;
   transition-timing-function: ease;
@@ -394,7 +395,7 @@ a.g-button {
 
 .d-button:hover {
   cursor: pointer;
-  background-color: rgb(159,28,25);
+  background-color: #5F88BF;
 }
 
 #upload:hover {
@@ -510,6 +511,10 @@ a.g-button {
   border: 3px black solid;
 }
 
+.sizer-selected {
+  background-color: white;
+}
+
 .prev-auth-head {
   text-align: center;
   font-family: 'Open Sans', sans-serif;
@@ -518,7 +523,7 @@ a.g-button {
   font-variant: normal;
   font-weight: bold;
   line-height: 1;
-  color: rgb(159,28,25);
+  color: #5F88BF;
 }
 
 .prev-auth-list {
@@ -534,7 +539,7 @@ a.g-button {
 
 footer {
   text-align: center;
-  background-color: rgb(5, 171, 235);
+  background-color: #233854;
 }
 
 .left-footer {
