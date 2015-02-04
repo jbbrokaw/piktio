@@ -35,6 +35,11 @@ var TextEntryView = Backbone.View.extend({
     $('#content').empty();
     $(this.el).html(textEntryTemplate(this.model.toJSON()));
     $('#content').append(this.el);
+    var targetHeight = $('.canvas-box').outerHeight(true) +
+      $('#prompt-entry').outerHeight(true)+ 40;
+    console.log("setting height to");
+    console.log(targetHeight);
+    $('.animated-section').height(targetHeight);
     _.each(this.model.get('authors'), function (author) {
       aView = new UserView({
         model: new UserModel(author)
@@ -120,6 +125,8 @@ var DrawingView = Backbone.View.extend({
     $('#content').empty();
     $(this.el).html(drawingTemplate(this.model.toJSON()));
     $('#content').append(this.el);
+    var targetHeight = $('.animated-section .instructions').outerHeight(true) + $('.canvas-box').height() + 40;
+    $('.animated-section').height(targetHeight);
 
     this.drawingCanvas = new fabric.Canvas('drawing', {
       isDrawingMode: true
@@ -274,6 +281,11 @@ var app_router = new AppRouter();
 app_router.on('route:defaultRoute', function () {
   this.mainModel = new StepModel();
   this.mainView = new TextEntryView({model: this.mainModel});
+  var targetHeight = $('.canvas-box').outerHeight(true) +
+      $('#prompt-entry').outerHeight(true)+ 40;
+  console.log("setting height to");
+  console.log(targetHeight);
+  $('.animated-section').height(targetHeight);
   $('.t-button').on('click', $.proxy(this.mainView.submitText, this.mainView));
 });
 
