@@ -204,6 +204,7 @@ var DrawingView = Backbone.View.extend({
       alert("Do not submit a blank canvas");
       return;
     }
+    $('audio')[0].play();
     animationDone = false;
     targ = $('.gameplay-area').height() - $('.animated-section').height();
     $('.animated-section').slideUp(
