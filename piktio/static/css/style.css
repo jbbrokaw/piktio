@@ -340,6 +340,7 @@ a.g-button {
   font-variant: normal;
   font-weight: bold;
   line-height: 1;
+  cursor: url(/static/pencil.png), auto;
 }
 
 .t-button {

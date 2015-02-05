@@ -164,7 +164,7 @@ a.g-button {
   display: block;
   margin: auto;
   margin-top: 1.5em;
-  border: 1px black solid;
+  border: none;
 }
 
 #prompt-entry.top {
