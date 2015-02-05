@@ -15,6 +15,9 @@
 </div>
 {% endblock %}
 {% block scripts %}
+<audio hidden>
+    <source src="{{ 'piktio:static/writing-signature-2.mp3' | static_path }}" type="audio/mpeg">
+</audio>
 {% raw %}
 <script id="text-entry-template" type="text/x-handlebars-template">
   <h1 class="section-title">{{ title }}</h1>

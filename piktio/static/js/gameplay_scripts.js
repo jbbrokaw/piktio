@@ -37,8 +37,6 @@ var TextEntryView = Backbone.View.extend({
     $('#content').append(this.el);
     var targetHeight = $('.canvas-box').outerHeight(true) +
       $('#prompt-entry').outerHeight(true)+ 40;
-    console.log("setting height to");
-    console.log(targetHeight);
     $('.animated-section').height(targetHeight);
     _.each(this.model.get('authors'), function (author) {
       aView = new UserView({
@@ -87,6 +85,7 @@ var TextEntryView = Backbone.View.extend({
       alert("You have to type something in the entry box");
       return;
     }
+    $('audio')[0].play();
     animationDone = false;
     targ = $('.gameplay-area').height() - $('.animated-section').height();
     $('.animated-section').slideUp(
@@ -283,8 +282,6 @@ app_router.on('route:defaultRoute', function () {
   this.mainView = new TextEntryView({model: this.mainModel});
   var targetHeight = $('.canvas-box').outerHeight(true) +
       $('#prompt-entry').outerHeight(true)+ 40;
-  console.log("setting height to");
-  console.log(targetHeight);
   $('.animated-section').height(targetHeight);
   $('.t-button').on('click', $.proxy(this.mainView.submitText, this.mainView));
 });
