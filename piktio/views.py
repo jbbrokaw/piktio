@@ -115,7 +115,8 @@ def subject(request):
     next_game = DBSession.query(Game).filter(Game.predicate_id.is_(None))\
         .filter(~Game.authors.contains(request.user)).first()
     if next_game is None:
-        return {'error': 'No suitable game for the next step'}
+        return {'error': 'No suitable game for the next step',
+                'redirect': request.route_path('games')}
     instructions = 'Like "disguised himself as a raincloud ' \
                    'to steal honey from the tree"'
     csrf = request.session.new_csrf_token()
@@ -151,7 +152,8 @@ def predicate(request):
         .filter(Game.first_drawing_id.is_(None))\
         .filter(~Game.authors.contains(request.user)).first()
     if next_game is None:
-        return {'error': 'No suitable game for the next step'}
+        return {'error': 'No suitable game for the next step',
+                'redirect': request.route_path('games')}
     instructions = " ".join([next_game.subject.subject,
                              next_game.predicate.predicate])
     csrf = request.session.new_csrf_token()
@@ -189,7 +191,8 @@ def first_drawing(request):
         .filter(Game.first_description_id.is_(None))\
         .filter(~Game.authors.contains(request.user)).first()
     if next_game is None:
-        return {'error': 'No suitable game for the next step'}
+        return {'error': 'No suitable game for the next step',
+                'redirect': request.route_path('games')}
     csrf = request.session.new_csrf_token()
     return {'title': 'Describe this drawing',
             'instructions': 'Try to make it fun to draw',
@@ -224,7 +227,8 @@ def first_description(request):
         .filter(Game.second_drawing_id.is_(None))\
         .filter(~Game.authors.contains(request.user)).first()
     if next_game is None:
-        return {'error': 'No suitable game for the next step'}
+        return {'error': 'No suitable game for the next step',
+                'redirect': request.route_path('games')}
     csrf = request.session.new_csrf_token()
     return {'title': 'Draw this sentence',
             'instructions': next_game.first_description.description,
@@ -260,7 +264,8 @@ def second_drawing(request):
         .filter(Game.second_description_id.is_(None))\
         .filter(~Game.authors.contains(request.user)).first()
     if next_game is None:
-        return {'error': 'No suitable game for the next step'}
+        return {'error': 'No suitable game for the next step',
+                'redirect': request.route_path('games')}
     csrf = request.session.new_csrf_token()
     return {'title': 'Describe this drawing',
             'instructions': 'Try to make it fun to draw',
