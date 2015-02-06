@@ -70,10 +70,14 @@ var TextEntryView = Backbone.View.extend({
     return function (server_response) {
       if (typeof(server_response.error) !== 'undefined') {
         alert(server_response.error);
+        if (typeof(server_response.redirect) !== 'undefined') {
+          window.open(server_response.redirect, '_self');
+        }
         return;
-      }
+        }
       if (typeof(server_response.redirect) !== 'undefined') {
         window.open(server_response.redirect, '_self');
+        return;
       }
       view.model.clear().set(server_response);
       reRender();
@@ -164,6 +168,13 @@ var DrawingView = Backbone.View.extend({
     return function (server_response) {
       if (typeof(server_response.error) !== 'undefined') {
         alert(server_response.error);
+        if (typeof(server_response.redirect) !== 'undefined') {
+          window.open(server_response.redirect, '_self');
+        }
+        return;
+      }
+      if (typeof(server_response.redirect) !== 'undefined') {
+        window.open(server_response.redirect, '_self');
         return;
       }
       view.model.clear().set(server_response);
@@ -241,7 +252,7 @@ var UserView = Backbone.View.extend({
   className: 'author-box',
 
   events: {
-    'click .f-button': 'follow',
+    'click .f-button': 'follow'
   },
 
   render: function () {
