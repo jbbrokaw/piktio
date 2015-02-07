@@ -1,7 +1,7 @@
 from apex.forms import RegisterForm
 from apex.lib.form import ExtendedForm
 
-from piktio.models import PiktioProfile, DBSession
+from piktio.models import PiktioProfile, DBSession, InviteAddress
 from apex.models import AuthID, AuthUser, AuthGroup
 from apex import MessageFactory as _
 from wtforms import StringField, validators, ValidationError
@@ -84,3 +84,16 @@ class DisplayNameForm(ExtendedForm):
         ).all()
         if existing_owners:
             raise ValidationError("Sorry, that name is taken")
+
+class InviteFriendForm(ExtendedForm):
+    email_address = StringField(_('Friend\'s email'),
+                                [validators.DataRequired(), validators.Email()])
+    email_body = StringField(_('Mail body'), default="Someone has invited you to join piktio.com")
+
+    def validate_email_address(form, field):
+        existing_emails = DBSession.query(AuthUser).filter(
+            AuthUser.email == field.data).all()
+        existing_emails.extend(DBSession.query(InviteAddress).filter(
+            AuthUser.email == field.data).all())
+        if existing_emails:
+            raise ValidationError("This person has already been invited")

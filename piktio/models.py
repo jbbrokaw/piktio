@@ -61,6 +61,12 @@ class PiktioProfile(Base):
     user = relationship(AuthID, backref=backref('profile', uselist=False))
 
 
+class InviteAddress(Base):
+    __tablename__ = "invite_address"
+    id = Column(Integer, primary_key=True)
+    email =- Column(Unicode(140), unique=True, nullable=False)
+
+
 class Subject(Base):
     __tablename__ = 'subject'
     id = Column(Integer, primary_key=True)
