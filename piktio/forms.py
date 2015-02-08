@@ -1,10 +1,10 @@
 from apex.forms import RegisterForm
 from apex.lib.form import ExtendedForm
 
-from piktio.models import PiktioProfile, DBSession
+from piktio.models import PiktioProfile, DBSession, InviteAddress
 from apex.models import AuthID, AuthUser, AuthGroup
 from apex import MessageFactory as _
-from wtforms import StringField, validators, ValidationError
+from wtforms import StringField, TextAreaField, validators, ValidationError
 from sqlalchemy.orm.exc import NoResultFound
 
 
@@ -84,3 +84,20 @@ class DisplayNameForm(ExtendedForm):
         ).all()
         if existing_owners:
             raise ValidationError("Sorry, that name is taken")
+
+class InviteFriendForm(ExtendedForm):
+    email_address = StringField(_('Friend\'s email'),
+                                [validators.DataRequired(), validators.Email()])
+    email_subject = StringField(_('Subject'), [validators.DataRequired()],
+                                default="Join piktio.com")
+    email_body = TextAreaField(_('Mail body'))
+
+    def validate_email_address(form, field):
+        existing_emails = DBSession.query(AuthUser).filter(
+            AuthUser.email == field.data).all()
+        if existing_emails:
+            raise ValidationError("This person already plays piktio")
+        existing_emails = DBSession.query(InviteAddress).filter(
+            InviteAddress.email == field.data).all()
+        if existing_emails:
+            raise ValidationError("This person has already been invited")

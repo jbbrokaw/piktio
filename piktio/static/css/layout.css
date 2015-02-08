@@ -45,7 +45,7 @@ table {
 }
 
 form {
-  width: 320px;
+  max-width: 100%;
   text-align: center;
   margin: auto;
   margin-top: 20px;
@@ -375,4 +375,9 @@ footer {
   display: block;
   float: right;
   margin: 0;
+}
+
+#email_body {
+  width: 50em;
+  height: 10em;
 }
