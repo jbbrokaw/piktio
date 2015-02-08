@@ -215,6 +215,7 @@ def _update_and_restart():
     with cd('piktio'):
         sudo('git pull origin master')
         sudo('kill -TERM $(cat supervisord.pid)')
+        sudo('initialize_piktio_db development.ini')
     _start_server()
 
 

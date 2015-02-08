@@ -35,6 +35,9 @@ var TextEntryView = Backbone.View.extend({
     $('#content').empty();
     $(this.el).html(textEntryTemplate(this.model.toJSON()));
     $('#content').append(this.el);
+    var targetHeight = $('.canvas-box').outerHeight(true) +
+      $('#prompt-entry').outerHeight(true)+ 40;
+    $('.animated-section').height(targetHeight);
     _.each(this.model.get('authors'), function (author) {
       aView = new UserView({
         model: new UserModel(author)
@@ -67,10 +70,14 @@ var TextEntryView = Backbone.View.extend({
     return function (server_response) {
       if (typeof(server_response.error) !== 'undefined') {
         alert(server_response.error);
+        if (typeof(server_response.redirect) !== 'undefined') {
+          window.open(server_response.redirect, '_self');
+        }
         return;
-      }
+        }
       if (typeof(server_response.redirect) !== 'undefined') {
         window.open(server_response.redirect, '_self');
+        return;
       }
       view.model.clear().set(server_response);
       reRender();
@@ -82,6 +89,7 @@ var TextEntryView = Backbone.View.extend({
       alert("You have to type something in the entry box");
       return;
     }
+    $('audio')[0].play();
     animationDone = false;
     targ = $('.gameplay-area').height() - $('.animated-section').height();
     $('.animated-section').slideUp(
@@ -120,6 +128,8 @@ var DrawingView = Backbone.View.extend({
     $('#content').empty();
     $(this.el).html(drawingTemplate(this.model.toJSON()));
     $('#content').append(this.el);
+    var targetHeight = $('.animated-section .instructions').outerHeight(true) + $('.canvas-box').height() + 40;
+    $('.animated-section').height(targetHeight);
 
     this.drawingCanvas = new fabric.Canvas('drawing', {
       isDrawingMode: true
@@ -158,6 +168,13 @@ var DrawingView = Backbone.View.extend({
     return function (server_response) {
       if (typeof(server_response.error) !== 'undefined') {
         alert(server_response.error);
+        if (typeof(server_response.redirect) !== 'undefined') {
+          window.open(server_response.redirect, '_self');
+        }
+        return;
+      }
+      if (typeof(server_response.redirect) !== 'undefined') {
+        window.open(server_response.redirect, '_self');
         return;
       }
       view.model.clear().set(server_response);
@@ -167,7 +184,9 @@ var DrawingView = Backbone.View.extend({
 
   setColor: function (event) {
     $element = $(event.currentTarget);
-    this.drawingCanvas.freeDrawingBrush.color = $element.css('background-color');
+    selectedColor = $element.css('background-color');
+    this.drawingCanvas.freeDrawingBrush.color = selectedColor;
+    $('.sizer .selector').css('background-color', selectedColor);
     $element.siblings().removeClass('selected');
     $element.addClass('selected');
   },
@@ -176,6 +195,8 @@ var DrawingView = Backbone.View.extend({
     $sizeElement = $(event.currentTarget).children().first();
     this.drawingCanvas.freeDrawingBrush.width = Number($sizeElement.css('height').slice(0, -2));
     $('.sizer .selector').removeClass('selected');
+    $('.sizer').removeClass('sizer-selected');
+    $sizeElement.parent().addClass('sizer-selected');
     $sizeElement.addClass('selected');
   },
 
@@ -194,6 +215,7 @@ var DrawingView = Backbone.View.extend({
       alert("Do not submit a blank canvas");
       return;
     }
+    $('audio')[0].play();
     animationDone = false;
     targ = $('.gameplay-area').height() - $('.animated-section').height();
     $('.animated-section').slideUp(
@@ -230,7 +252,7 @@ var UserView = Backbone.View.extend({
   className: 'author-box',
 
   events: {
-    'click .f-button': 'follow',
+    'click .f-button': 'follow'
   },
 
   render: function () {
@@ -270,6 +292,9 @@ var app_router = new AppRouter();
 app_router.on('route:defaultRoute', function () {
   this.mainModel = new StepModel();
   this.mainView = new TextEntryView({model: this.mainModel});
+  var targetHeight = $('.canvas-box').outerHeight(true) +
+      $('#prompt-entry').outerHeight(true)+ 40;
+  $('.animated-section').height(targetHeight);
   $('.t-button').on('click', $.proxy(this.mainView.submitText, this.mainView));
 });
 
