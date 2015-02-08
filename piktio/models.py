@@ -64,7 +64,7 @@ class PiktioProfile(Base):
 class InviteAddress(Base):
     __tablename__ = "invite_address"
     id = Column(Integer, primary_key=True)
-    email =- Column(Unicode(140), unique=True, nullable=False)
+    email = Column(Unicode(140), unique=True, nullable=False)
 
 
 class Subject(Base):

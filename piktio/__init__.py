@@ -61,6 +61,7 @@ def main(global_config, **settings):
     )
     config.add_route('follow', '/follow')
     config.add_route('change_name', '/display_name')
+    config.add_route('invite', '/invite')
     config.include('apex', route_prefix='/auth')
     config.scan()
     return config.make_wsgi_app()

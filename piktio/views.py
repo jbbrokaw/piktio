@@ -5,6 +5,7 @@ import json
 from pyramid.view import view_config  # , forbidden_view_config
 from pyramid.httpexceptions import HTTPFound
 from apex.lib.flash import flash
+from apex.lib.libapex import apex_email
 
 from piktio.models import (
     DBSession,
@@ -14,16 +15,17 @@ from piktio.models import (
     Drawing,
     Description,
     Game,
-    PiktioProfile
+    PiktioProfile,
+    InviteAddress
 )
 from piktio.storage import upload_photo
-from piktio.forms import DisplayNameForm
+from piktio.forms import DisplayNameForm, InviteFriendForm
 from piktio import serializers
 
 from apex.models import (AuthID, AuthUser, AuthGroup)
-
 from apex.lib.libapex import apex_settings, get_module, apex_remember
 from apex import MessageFactory as _
+from apex.lib.flash import flash
 
 _ROW_LIMIT = 500
 
@@ -368,5 +370,36 @@ def change_name(request):
         return HTTPFound(location=request.route_path('home'))
 
     return {'title': 'Change your display name',
+            'user': request.user,
+            'form': form}
+
+
+@view_config(route_name='invite', renderer='templates/forms.html',
+             permission='authenticated')
+def invite(request):
+    form = InviteFriendForm(
+        request.POST,
+        captcha={'ip_address': request.environ['REMOTE_ADDR']}
+    )
+
+    if request.method == 'POST' and form.validate():
+        new_invitation = InviteAddress(email=form.data['email_address'])
+        body = form.data['email_body'] + """
+_____
+This message was sent to invite you to join piktio.com.
+You will never receive email from this site again.
+"""
+        apex_email(request, recipients=form.data['email_address'],
+                   subject=form.data['email_subject'], body=body)
+        DBSession.add(new_invitation)
+        flash(_('Invitation email sent.'))
+        return HTTPFound(location=request.route_path('invite'))
+
+    form.email_body.data = \
+"""Hello,
+    %s has invited you to join piktio.com. We hope to see you there!
+""" % request.user.display_name
+
+    return {'title': 'Invite someone to join piktio!',
             'user': request.user,
             'form': form}
