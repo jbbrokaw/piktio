@@ -140,3 +140,20 @@ class Rating(Base):
     game = Column(Integer, ForeignKey(Game.id), primary_key=True)
     rater = Column(Integer, ForeignKey(PiktioProfile.id), primary_key=True)
     rating = Column(Integer)
+
+
+class Strikes(Base):
+    __tablename__ = "strikes"
+    id = Column(Integer, primary_key=True)
+    author_id = Column(Integer, ForeignKey(PiktioProfile.id), index=True)
+    subject_id = Column(Integer, ForeignKey(Subject.id), index=True, nullable=True)
+    predicate_id = Column(Integer, ForeignKey(Predicate.id), index=True, nullable=True)
+    drawing_id = Column(Integer, ForeignKey(Drawing.id), index=True, nullable=True)
+    description_id = Column(Integer, ForeignKey(Description.id), index=True, nullable=True)
+
+    author = relationship(PiktioProfile, backref='strikes')
+    subject = relationship(Subject, backref='strikes')
+    predicate = relationship(Predicate, backref='strikes')
+    drawing = relationship(Drawing, backref='strikes')
+    description = relationship(Description, backref='strikes')
+
