@@ -336,6 +336,12 @@ a.g-button {
   margin: 2px;
 }
 
+.strike {
+  margin: auto;
+  max-width: 320px;
+  padding: 1em;
+}
+
 .prev-auth-head {
   margin: auto;
   max-width: 50%;

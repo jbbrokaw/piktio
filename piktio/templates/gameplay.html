@@ -35,6 +35,9 @@
       {{/if }}
     </div>
   </div>
+  {{#if drawing }}
+  <p class="strike">This is a bad drawing.</p>
+  {{/if }}
   <button id="submit-text" class="t-button">Submit</button>
   {{#if game_id }}
   <h3 class="prev-auth-head">Previous authors on this game:</h3>
@@ -53,6 +56,9 @@
       </div>
     </div>
   </div>
+  {{#if instructions }}
+  <p class="strike">This is a bad prompt.</p>
+  {{/if }}
   <div class="control-box cf">
     <ul class="button-box cf">
       <li id="undo" class="d-button">Undo</li>

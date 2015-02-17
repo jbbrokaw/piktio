@@ -516,6 +516,22 @@ a.g-button {
   background-color: white;
 }
 
+.strike {
+  text-align: center;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 0.7em;
+  font-style: normal;
+  font-variant: normal;
+  font-weight: bold;
+  line-height: 1;
+  color: white;
+}
+
+.strike:hover {
+  cursor: pointer;
+  background-color: #233854;
+}
+
 .prev-auth-head {
   text-align: center;
   font-family: 'Open Sans', sans-serif;
