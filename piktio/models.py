@@ -38,7 +38,32 @@ def copy_game_to_step(game, step):
 
 
 def get_valid_game(request):
-    pass
+    if request.session['step'] == 'first_drawing':
+        subject_strikes = DBSession.query(Strikes)\
+            .filter(
+                Strikes.author_id == request.user.id,
+                ~Strikes.subject_id.is_(None)
+            ).all()
+
+        predicate_strikes = DBSession.query(Strikes)\
+            .filter(
+                Strikes.author_id == request.user.id,
+                ~Strikes.predicate_id.is_(None)
+            ).all()
+
+        bad_subject_ids = [strike.subject_id for strike in subject_strikes]
+        bad_predicate_ids = [strike.predicate_id for strike in predicate_strikes]
+
+        next_game = DBSession.query(Game)\
+            .filter(
+                ~Game.first_drawing_id.is_(None),
+                Game.first_description_id.is_(None),
+                ~Game.authors.contains(request.user),
+                ~Game.subject_id.in_(bad_subject_ids),
+                ~Game.predicate_id.in_(bad_predicate_ids)
+            ).first()
+
+        return next_game
 
 
 follower_followee = Table(

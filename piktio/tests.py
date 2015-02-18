@@ -233,3 +233,6 @@ class TestFunctionalLoginAndViews(unittest.TestCase):
         self.assertEqual(strikes[0].author.display_name, "Eggs")
         self.assertEqual(strikes[1].predicate.predicate, "bacon predicate")
         self.assertEqual(strikes[1].author.display_name, "Eggs")
+        # There should be no available game anymore
+        struck_response = json.loads(res.body)
+        self.assertEqual(struck_response['error'], 'no suitable game')

@@ -9,6 +9,7 @@ from apex.lib.libapex import apex_email
 
 from piktio.models import (
     DBSession,
+    get_valid_game,
     copy_game_to_step,
     Subject,
     Predicate,
@@ -421,4 +422,8 @@ def strike(request):
         predicate_strike.predicate = game.predicate
         DBSession.add(subject_strike)
         DBSession.add(predicate_strike)
-        return
+        request.session['step'] = 'first_drawing'
+        next_game = get_valid_game(request)
+        if next_game is None:
+            return {'error': 'no suitable game',
+                    'redirect': request.route_path('invite')}
