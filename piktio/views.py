@@ -16,7 +16,8 @@ from piktio.models import (
     Description,
     Game,
     PiktioProfile,
-    InviteAddress
+    InviteAddress,
+    Strikes,
 )
 from piktio.storage import upload_photo
 from piktio.forms import DisplayNameForm, InviteFriendForm
@@ -118,7 +119,7 @@ def subject(request):
         .filter(~Game.authors.contains(request.user)).first()
     if next_game is None:
         return {'error': 'No suitable game for the next step',
-                'redirect': request.route_path('games')}
+                'redirect': request.route_path('invite')}
     instructions = 'Like "disguised himself as a raincloud ' \
                    'to steal honey from the tree"'
     csrf = request.session.new_csrf_token()
@@ -155,7 +156,7 @@ def predicate(request):
         .filter(~Game.authors.contains(request.user)).first()
     if next_game is None:
         return {'error': 'No suitable game for the next step',
-                'redirect': request.route_path('games')}
+                'redirect': request.route_path('invite')}
     instructions = " ".join([next_game.subject.subject,
                              next_game.predicate.predicate])
     csrf = request.session.new_csrf_token()
@@ -194,7 +195,7 @@ def first_drawing(request):
         .filter(~Game.authors.contains(request.user)).first()
     if next_game is None:
         return {'error': 'No suitable game for the next step',
-                'redirect': request.route_path('games')}
+                'redirect': request.route_path('invite')}
     csrf = request.session.new_csrf_token()
     return {'title': 'Describe this drawing',
             'instructions': 'Try to make it fun to draw',
@@ -230,7 +231,7 @@ def first_description(request):
         .filter(~Game.authors.contains(request.user)).first()
     if next_game is None:
         return {'error': 'No suitable game for the next step',
-                'redirect': request.route_path('games')}
+                'redirect': request.route_path('invite')}
     csrf = request.session.new_csrf_token()
     return {'title': 'Draw this sentence',
             'instructions': next_game.first_description.description,
@@ -267,7 +268,7 @@ def second_drawing(request):
         .filter(~Game.authors.contains(request.user)).first()
     if next_game is None:
         return {'error': 'No suitable game for the next step',
-                'redirect': request.route_path('games')}
+                'redirect': request.route_path('invite')}
     csrf = request.session.new_csrf_token()
     return {'title': 'Describe this drawing',
             'instructions': 'Try to make it fun to draw',
@@ -403,3 +404,21 @@ You will never receive email from this site again.
     return {'title': 'Invite someone to join piktio!',
             'user': request.user,
             'form': form}
+
+
+@view_config(route_name='strike', renderer='json',
+             permission='authenticated')
+def strike(request):
+    """Add a strike to the prompt/drawing for this step, return a new prompt drawing"""
+    game = DBSession.query(Game).filter(
+        Game.id == request.POST['game_id']).one()
+    if request.matchdict['step'] == 'first_drawing':
+        subject_strike = Strikes()
+        subject_strike.author = request.user
+        subject_strike.subject = game.subject
+        predicate_strike = Strikes()
+        predicate_strike.author = request.user
+        predicate_strike.predicate = game.predicate
+        DBSession.add(subject_strike)
+        DBSession.add(predicate_strike)
+        return

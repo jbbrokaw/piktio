@@ -8,7 +8,8 @@ from piktio.models import (DBSession,
                            PiktioProfile,
                            Subject,
                            Predicate,
-                           Game
+                           Game,
+                           Strikes,
                            )
 from webtest import TestApp
 from piktio.forms import NewRegisterForm, create_user
@@ -36,9 +37,11 @@ class TestFunctionalLoginAndViews(unittest.TestCase):
                     'apex.came_from_route': 'home',
                     'facebook.consumer_key': '${FACEBOOK_CONSUMER_KEY}',
                     'facebook.consumer_secret': '${FACEBOOK_CONSUMER_SECRET}',
+                    'google.consumer_key': '${GOOGLE_CONSUMER_KEY}',
+                    'google.consumer_secret': '${GOOGLE_CONSUMER_SECRET}',
                     'jinja2.filters': {
-                        'route_url': 'pyramid_jinja2.filters:route_url_filter',
-                        'static_url': 'pyramid_jinja2.filters:static_url_filter'},
+                        'route_path': 'pyramid_jinja2.filters:route_path_filter',
+                        'static_path': 'pyramid_jinja2.filters:static_path_filter'},
                     'session.constant_csrf_token': self.csrf
                     }
         app = main({}, **settings)
@@ -192,3 +195,41 @@ class TestFunctionalLoginAndViews(unittest.TestCase):
         # With the same first subject in both
         firstsubj = DBSession.query(Subject).filter(Subject.id == firstsubj_id).one()
         self.assertEqual(len(firstsubj.games), 2)
+
+    def test_post_strike(self):
+        import json
+        self.create_and_login_user()  # Testy
+        payload = {'prompt': "TEST SUBJECT",
+                   'csrf_token': self.csrf}
+        self.testapp.post('/subject', payload)
+        firstgame_id = DBSession.query(Game).one().id
+        transaction.commit()
+
+        self.create_and_login_user(username="bacon", display_name="Bacon")
+        payload['prompt'] = "Bacon bacon bacon"
+        res = self.testapp.post('/subject', payload)
+        bacon_load = json.loads(res.body)
+        # Bacon is working on Testy's game
+        self.assertEqual(bacon_load['game_id'], firstgame_id)
+        bacon_load['prompt'] = "bacon predicate"
+        res = self.testapp.post('/predicate', bacon_load)
+        transaction.commit()
+
+        self.create_and_login_user(username="eggs", display_name="Eggs")
+        payload['prompt'] = "eggs eggs eggs"
+        res = self.testapp.post('/subject', payload)
+        egg_load = json.loads(res.body)
+        # Eggs is working on bacon's subject
+        egg_load['prompt'] = "egg predicate"
+        res = self.testapp.post('/predicate', egg_load)
+        game_data = json.loads(res.body)
+        # We are working on testy & bacon's prompt
+        self.assertEqual(game_data['instructions'], 'TEST SUBJECT bacon predicate')
+        res = self.testapp.post(game_data['route'] + '/strike', game_data)
+        # That should add strikes from Eggs to Testy's subject and Bacon's predicate
+        strikes = DBSession.query(Strikes).all()
+        self.assertEqual(len(strikes), 2)
+        self.assertEqual(strikes[0].subject.subject, "TEST SUBJECT")
+        self.assertEqual(strikes[0].author.display_name, "Eggs")
+        self.assertEqual(strikes[1].predicate.predicate, "bacon predicate")
+        self.assertEqual(strikes[1].author.display_name, "Eggs")

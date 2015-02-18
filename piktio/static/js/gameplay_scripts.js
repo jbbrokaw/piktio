@@ -28,7 +28,8 @@ var UserModel = Backbone.Model.extend({
 var TextEntryView = Backbone.View.extend({
 
   events: {
-    'click .t-button': 'submitText'
+    'click .t-button': 'submitText',
+    'click .strike': 'sendStrike'
   },
 
   render: function () {
@@ -109,6 +110,18 @@ var TextEntryView = Backbone.View.extend({
       .fail(function (response) {
         console.log(response);
     });
+  },
+
+  submitStrike: function () {
+    var payload = {'game_id': this.model.get('game_id'),
+                   'csrf_token': this.model.get('csrf_token')};
+    $.post(this.model.get('route') + '/strike', payload)
+      .done(function (response) {
+        alert("Strikes added");
+      })
+      .fail(function (response) {
+        console.log(response);
+    });
   }
 });
 
@@ -120,8 +133,9 @@ var DrawingView = Backbone.View.extend({
     'click .size-selectors .sizer': 'setSize',
     'click #undo': 'undo',
     'click #clear': 'clear',
-    'click #toggle-controls': 'toggleFreeDraw'
+    'click #toggle-controls': 'toggleFreeDraw',
     //'click #redo': 'redo'
+    'click .strike': 'submitStrike'
   },
 
   render: function () {
@@ -245,6 +259,18 @@ var DrawingView = Backbone.View.extend({
       $(event.currentTarget).text("Edit");
       this.drawingCanvas.isDrawingMode = true;
     }
+  },
+
+  submitStrike: function () {
+    var payload = {'game_id': this.model.get('game_id'),
+                   'csrf_token': this.model.get('csrf_token')};
+    $.post(this.model.get('route') + '/strike', payload)
+      .done(function (response) {
+        alert("Strikes added");
+      })
+      .fail(function (response) {
+        console.log(response);
+    });
   }
 });
 

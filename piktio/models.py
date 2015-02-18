@@ -36,6 +36,11 @@ def copy_game_to_step(game, step):
         new_game.authors.append(author)
     return new_game
 
+
+def get_valid_game(request):
+    pass
+
+
 follower_followee = Table(
     "follower_followee",
     Base.metadata,
