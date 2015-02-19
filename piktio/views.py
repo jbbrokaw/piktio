@@ -116,22 +116,10 @@ def subject(request):
     new_game.authors.append(request.user)
     DBSession.add(new_game)
     DBSession.flush()
-    next_game = DBSession.query(Game).filter(Game.predicate_id.is_(None))\
-        .filter(~Game.authors.contains(request.user)).first()
-    if next_game is None:
-        return {'error': 'No suitable game for the next step',
-                'redirect': request.route_path('invite')}
-    instructions = 'Like "disguised himself as a raincloud ' \
-                   'to steal honey from the tree"'
-    csrf = request.session.new_csrf_token()
-    return {'title': 'Enter the predicate of a sentence',
-            'instructions': instructions,
-            'game_id': next_game.id,
-            'authors': [serializers.author(auth, request)
-                        for auth in next_game.authors],
-            'route': request.route_path('predicate'),
-            'csrf_token': csrf
-            }
+    request.session['step'] = 'predicate'
+    next_game = get_valid_game(request)
+
+    return serializers.step(next_game, request)
 
 
 @view_config(route_name='predicate', renderer='json', request_method='POST',
@@ -151,24 +139,10 @@ def predicate(request):
     game.authors.append(request.user)
     DBSession.add(game)
     DBSession.flush()
-    next_game = DBSession.query(Game)\
-        .filter(~Game.predicate_id.is_(None))\
-        .filter(Game.first_drawing_id.is_(None))\
-        .filter(~Game.authors.contains(request.user)).first()
-    if next_game is None:
-        return {'error': 'No suitable game for the next step',
-                'redirect': request.route_path('invite')}
-    instructions = " ".join([next_game.subject.subject,
-                             next_game.predicate.predicate])
-    csrf = request.session.new_csrf_token()
-    return {'title': 'Draw this sentence',
-            'instructions': instructions,
-            'game_id': next_game.id,
-            'authors': [serializers.author(auth, request)
-                        for auth in next_game.authors],
-            'route': request.route_path('first_drawing'),
-            'csrf_token': csrf
-            }
+    request.session['step'] = 'first_drawing'
+    next_game = get_valid_game(request)
+
+    return serializers.step(next_game, request)
 
 
 @view_config(route_name='first_drawing', renderer='json',
@@ -190,23 +164,10 @@ def first_drawing(request):
     game.authors.append(request.user)
     DBSession.add(game)
     DBSession.flush()
-    next_game = DBSession.query(Game)\
-        .filter(~Game.first_drawing_id.is_(None))\
-        .filter(Game.first_description_id.is_(None))\
-        .filter(~Game.authors.contains(request.user)).first()
-    if next_game is None:
-        return {'error': 'No suitable game for the next step',
-                'redirect': request.route_path('invite')}
-    csrf = request.session.new_csrf_token()
-    return {'title': 'Describe this drawing',
-            'instructions': 'Try to make it fun to draw',
-            'game_id': next_game.id,
-            'drawing': next_game.first_drawing.identifier,
-            'authors': [serializers.author(auth, request)
-                        for auth in next_game.authors],
-            'route': request.route_path('first_description'),
-            'csrf_token': csrf
-            }
+    request.session['step'] = 'first_description'
+    next_game = get_valid_game(request)
+
+    return serializers.step(next_game, request)
 
 
 @view_config(route_name='first_description', renderer='json',
@@ -226,22 +187,10 @@ def first_description(request):
     game.authors.append(request.user)
     DBSession.add(game)
     DBSession.flush()
-    next_game = DBSession.query(Game)\
-        .filter(~Game.first_description_id.is_(None))\
-        .filter(Game.second_drawing_id.is_(None))\
-        .filter(~Game.authors.contains(request.user)).first()
-    if next_game is None:
-        return {'error': 'No suitable game for the next step',
-                'redirect': request.route_path('invite')}
-    csrf = request.session.new_csrf_token()
-    return {'title': 'Draw this sentence',
-            'instructions': next_game.first_description.description,
-            'game_id': next_game.id,
-            'authors': [serializers.author(auth, request)
-                        for auth in next_game.authors],
-            'route': request.route_path('second_drawing'),
-            'csrf_token': csrf
-            }
+    request.session['step'] = 'second_drawing'
+    next_game = get_valid_game(request)
+
+    return serializers.step(next_game, request)
 
 
 @view_config(route_name='second_drawing', renderer='json',
@@ -263,23 +212,10 @@ def second_drawing(request):
     game.authors.append(request.user)
     DBSession.add(game)
     DBSession.flush()
-    next_game = DBSession.query(Game)\
-        .filter(~Game.second_drawing_id.is_(None))\
-        .filter(Game.second_description_id.is_(None))\
-        .filter(~Game.authors.contains(request.user)).first()
-    if next_game is None:
-        return {'error': 'No suitable game for the next step',
-                'redirect': request.route_path('invite')}
-    csrf = request.session.new_csrf_token()
-    return {'title': 'Describe this drawing',
-            'instructions': 'Try to make it fun to draw',
-            'game_id': next_game.id,
-            'drawing': next_game.second_drawing.identifier,
-            'authors': [serializers.author(auth, request)
-                        for auth in next_game.authors],
-            'route': request.route_path('second_description'),
-            'csrf_token': csrf
-            }
+    request.session['step'] = 'second_description'
+    next_game = get_valid_game(request)
+
+    return serializers.step(next_game, request)
 
 
 @view_config(route_name='second_description', renderer='json',
@@ -304,12 +240,6 @@ def second_description(request):
     return {'info': 'Game completed',
             'redirect': request.route_path('games')
             }
-
-
-# Just for DEBUG, DELETE THIS FOR PRODUCTION
-# @forbidden_view_config(renderer='json')
-# def forbidden(request):
-#     return {'forbidden': request.exception.message}
 
 
 @view_config(

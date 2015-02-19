@@ -38,6 +38,19 @@ def copy_game_to_step(game, step):
 
 
 def get_valid_game(request):
+    """Get a valid game for the step in request.session['step']
+    'Valid' means the game is complete to the previous step, has not been
+    worked on by request.user, and the prompt/drawing has not been previously
+    rejected by request.user"""
+    if request.session['step'] == 'predicate':
+        next_game = DBSession.query(Game)\
+            .filter(
+                ~Game.subject_id.is_(None),
+                Game.predicate_id.is_(None),
+                ~Game.authors.contains(request.user),
+            ).first()
+        return next_game
+
     if request.session['step'] == 'first_drawing':
         subject_strikes = DBSession.query(Strikes)\
             .filter(
@@ -56,11 +69,68 @@ def get_valid_game(request):
 
         next_game = DBSession.query(Game)\
             .filter(
-                ~Game.first_drawing_id.is_(None),
-                Game.first_description_id.is_(None),
+                ~Game.predicate_id.is_(None),
+                Game.first_drawing_id.is_(None),
                 ~Game.authors.contains(request.user),
                 ~Game.subject_id.in_(bad_subject_ids),
                 ~Game.predicate_id.in_(bad_predicate_ids)
+            ).first()
+
+        return next_game
+
+    if request.session['step'] == 'first_description':
+        drawing_strikes = DBSession.query(Strikes)\
+            .filter(
+                Strikes.author_id == request.user.id,
+                ~Strikes.drawing_id.is_(None)
+            ).all()
+
+        bad_drawing_ids = [strike.drawing_id for strike in drawing_strikes]
+
+        next_game = DBSession.query(Game)\
+            .filter(
+                ~Game.first_drawing_id.is_(None),
+                Game.first_description_id.is_(None),
+                ~Game.authors.contains(request.user),
+                ~Game.first_drawing_id.in_(bad_drawing_ids)
+            ).first()
+
+        return next_game
+
+    if request.session['step'] == 'second_drawing':
+        description_strikes = DBSession.query(Strikes)\
+            .filter(
+                Strikes.author_id == request.user.id,
+                ~Strikes.description_id.is_(None)
+            ).all()
+
+        bad_description_ids = [strike.description_id for strike in description_strikes]
+
+        next_game = DBSession.query(Game)\
+            .filter(
+                ~Game.first_description_id.is_(None),
+                Game.second_drawing_id.is_(None),
+                ~Game.authors.contains(request.user),
+                ~Game.first_description_id.in_(bad_description_ids)
+            ).first()
+
+        return next_game
+
+    if request.session['step'] == 'second_description':
+        drawing_strikes = DBSession.query(Strikes)\
+            .filter(
+                Strikes.author_id == request.user.id,
+                ~Strikes.drawing_id.is_(None)
+            ).all()
+
+        bad_drawing_ids = [strike.drawing_id for strike in drawing_strikes]
+
+        next_game = DBSession.query(Game)\
+            .filter(
+                ~Game.second_drawing_id.is_(None),
+                Game.second_description_id.is_(None),
+                ~Game.authors.contains(request.user),
+                ~Game.second_drawing_id.in_(bad_drawing_ids)
             ).first()
 
         return next_game

@@ -63,26 +63,26 @@ _INSTRUCTIONS = {'predicate': 'Like "disguised himself as a raincloud ' +
 
 def step(game, request):
     if game is None:
-        return {'error': 'no suitable game',
+        return {'error': 'No suitable game for the next step',
                 'redirect': request.route_path('invite')}
 
     csrf = request.session.new_csrf_token()
-    step_response = {'title': _TITLES[request.step],
+    step_response = {'title': _TITLES[request.session['step']],
                      'game_id': game.id,
                      'authors': [author(auth, request)
                                  for auth in game.authors],
-                     'route': request.route_path(request.step),
+                     'route': request.route_path(request.session['step']),
                      'csrf_token': csrf}
 
-    if _INSTRUCTIONS[request.step]:
-        step_response['instructions'] = _INSTRUCTIONS[request.step]
+    if _INSTRUCTIONS[request.session['step']]:
+        step_response['instructions'] = _INSTRUCTIONS[request.session['step']]
     else:
         step_response['instructions'] = " ".join([game.subject.subject,
                                                   game.predicate.predicate])
 
-    if request.step == 'first_description':
+    if request.session['step'] == 'first_description':
         step_response['drawing'] = game.first_drawing.identifier
-    if request.step == 'second_description':
+    if request.session['step'] == 'second_description':
         step_response['drawing'] = game.second_drawing.identifier
 
     return step_response
