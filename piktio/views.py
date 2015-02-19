@@ -353,7 +353,32 @@ def strike(request):
         DBSession.add(subject_strike)
         DBSession.add(predicate_strike)
         request.session['step'] = 'first_drawing'
-
         next_game = get_valid_game(request)
+        return serializers.step(next_game, request)
 
+    if request.matchdict['step'] == 'first_description':
+        drawing_strike = Strikes()
+        drawing_strike.author = request.user
+        drawing_strike.drawing = game.first_drawing
+        DBSession.add(drawing_strike)
+        request.session['step'] = 'first_description'
+        next_game = get_valid_game(request)
+        return serializers.step(next_game, request)
+
+    if request.matchdict['step'] == 'second_drawing':
+        description_strike = Strikes()
+        description_strike.author = request.user
+        description_strike.description = game.first_description
+        DBSession.add(description_strike)
+        request.session['step'] = 'second_drawing'
+        next_game = get_valid_game(request)
+        return serializers.step(next_game, request)
+
+    if request.matchdict['step'] == 'second_description':
+        drawing_strike = Strikes()
+        drawing_strike.author = request.user
+        drawing_strike.drawing = game.second_drawing
+        DBSession.add(drawing_strike)
+        request.session['step'] = 'second_description'
+        next_game = get_valid_game(request)
         return serializers.step(next_game, request)

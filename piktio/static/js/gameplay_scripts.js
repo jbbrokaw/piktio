@@ -29,7 +29,7 @@ var TextEntryView = Backbone.View.extend({
 
   events: {
     'click .t-button': 'submitText',
-    'click .strike': 'sendStrike'
+    'click .strike': 'submitStrike'
   },
 
   render: function () {
@@ -112,13 +112,32 @@ var TextEntryView = Backbone.View.extend({
     });
   },
 
+  resetStep: function (view) {
+    return function (server_response) {
+      if (typeof(server_response.error) !== 'undefined') {
+        alert(server_response.error);
+        if (typeof(server_response.redirect) !== 'undefined') {
+          window.open(server_response.redirect, '_self');
+        }
+        return;
+      }
+      if (typeof(server_response.redirect) !== 'undefined') {
+        window.open(server_response.redirect, '_self');
+        return;
+      }
+      view.model.clear().set(server_response);
+      view.remove();
+      view = new TextEntryView({model: view.model});
+      view.render();
+      app_router.mainView = view;
+    };
+  },
+
   submitStrike: function () {
     var payload = {'game_id': this.model.get('game_id'),
                    'csrf_token': this.model.get('csrf_token')};
     $.post(this.model.get('route') + '/strike', payload)
-      .done(function (response) {
-        alert("Strikes added");
-      })
+      .done(this.resetStep(this))
       .fail(function (response) {
         console.log(response);
     });
@@ -261,13 +280,34 @@ var DrawingView = Backbone.View.extend({
     }
   },
 
+  resetStep: function (view) {
+    return function (server_response) {
+      if (typeof(server_response.error) !== 'undefined') {
+        alert(server_response.error);
+        if (typeof(server_response.redirect) !== 'undefined') {
+          window.open(server_response.redirect, '_self');
+        }
+        return;
+      }
+      if (typeof(server_response.redirect) !== 'undefined') {
+        window.open(server_response.redirect, '_self');
+        return;
+      }
+      view.model.clear().set(server_response);
+      view.drawingCanvas.dispose();
+      view.remove();
+      view = new DrawingView({model: view.model});
+      view.render();
+      app_router.mainView = view;
+    };
+  },
+
   submitStrike: function () {
+    console.log('Strike submitted');
     var payload = {'game_id': this.model.get('game_id'),
                    'csrf_token': this.model.get('csrf_token')};
     $.post(this.model.get('route') + '/strike', payload)
-      .done(function (response) {
-        alert("Strikes added");
-      })
+      .done(this.resetStep(this))
       .fail(function (response) {
         console.log(response);
     });
