@@ -423,7 +423,7 @@ def strike(request):
         DBSession.add(subject_strike)
         DBSession.add(predicate_strike)
         request.session['step'] = 'first_drawing'
+
         next_game = get_valid_game(request)
-        if next_game is None:
-            return {'error': 'no suitable game',
-                    'redirect': request.route_path('invite')}
+
+        return serializers.step(next_game, request)
