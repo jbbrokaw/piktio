@@ -569,62 +569,59 @@ footer {
 }
 
 /* 'star-rating' component */
-.starRate {
-  position: relative;
-  margin: auto;
-  width: 240px;
-  overflow: hidden;
-  zoom: 1;
+.rating {
+    margin: auto;
+    width: 320px;
 }
 
-.starRate ul {
-  width: 160px;
-  margin: 0;
-  padding:0;
+/* :not(:checked) is a filter, so that browsers that don’t support :checked don’t
+   follow these rules. Every browser that supports :checked also supports :not(), so
+   it doesn’t make the test unnecessarily selective */
+.rating:not(:checked) > input {
+    position:absolute;
+    top:-9999px;
+    clip:rect(0,0,0,0);
 }
 
-.starRate li {
-  display: inline;
-  list-style:none;
+.rating:not(:checked) > label {
+    float:right;
+    width:1em;
+    padding:0 .1em;
+    overflow:hidden;
+    white-space:nowrap;
+    cursor:pointer;
+    font-size:200%;
+    line-height:1.2;
+    color:#ddd;
+    text-shadow:1px 1px #bbb, 2px 2px #666, .1em .1em .2em rgba(0,0,0,.5);
 }
 
-.starRate a, .starRate b {
-  background: url(/static/star_rate.gif) left top repeat-x;
+.rating:not(:checked) > label:before {
+    content: '★ ';
 }
 
-.starRate a {
-  float: right;
-  margin: 0 80px 0 -144px;
-  width: 80px;
-  height: 16px;
-  background-position: left 16px;
-  text-decoration: none;
+.rating > input:checked ~ label {
+    color: #f70;
+    text-shadow:1px 1px #c60, 2px 2px #940, .1em .1em .2em rgba(0,0,0,.5);
 }
 
-.starRate a:hover {
-  background-position: left -32px;
+.rating:not(:checked) > label:hover,
+.rating:not(:checked) > label:hover ~ label {
+    color: gold;
+    text-shadow:1px 1px goldenrod, 2px 2px #B57340, .1em .1em .2em rgba(0,0,0,.5);
 }
 
-.starRate b {
-  position:absolute;
-  z-index: -1;
-  width: 80px;
-  height: 16px;
-  background-position: left -16px;
+.rating > input:checked + label:hover,
+.rating > input:checked + label:hover ~ label,
+.rating > input:checked ~ label:hover,
+.rating > input:checked ~ label:hover ~ label,
+.rating > label:hover ~ input:checked ~ label {
+    color: #ea0;
+    text-shadow:1px 1px goldenrod, 2px 2px #B57340, .1em .1em .2em rgba(0,0,0,.5);
 }
 
-.starRate p b {
-  left: 0px;
-  bottom: 0px;
-  background-position: left top;
-}
-
-.starRate a span {
-  position: absolute;
-  left: -300px;
-}
-
-.starRate a:hover span {
-  left: 90px;
-  width:100%;
+.rating > label:active {
+    position:relative;
+    top:2px;
+    left:2px;
 }
