@@ -4,9 +4,11 @@
 var gameCollectionSource = $("#game-collection-template").html();
 var gameSource = $("#game-template").html();
 var userSource = $('#user-template').html();
+var ratingSource = $('#rating-template').html();
 var gameCollectionTemplate = Handlebars.compile(gameCollectionSource);
 var gameTemplate = Handlebars.compile(gameSource);
 var userTemplate = Handlebars.compile(userSource);
+var ratingTemplate = Handlebars.compile(ratingSource);
 
 
 var GameModel = Backbone.Model.extend({});
@@ -29,7 +31,7 @@ var UserModel = Backbone.Model.extend({
   }
 });
 
-var ScoreModel = Backbone.Model.extend({
+var RatingModel = Backbone.Model.extend({
   defaults: {
     'csrf_token': $('#csrf').val(),
   }
@@ -142,6 +144,14 @@ var GameView = Backbone.View.extend({
     });
     secDescAuthView.render();
 
+    $('.rating-box').remove();
+    $('<div class="rating-box"></div>').insertAfter('.game');
+    var ratingView = new RatingView({
+      model: new RatingModel(this.model.get('rating')),
+      el: $('.rating-box')[0]
+    });
+    ratingView.render();
+
     return this;
   }
 });
@@ -161,8 +171,6 @@ var UserView = Backbone.View.extend({
   },
 
   follow: function () {
-    console.log("Following");
-    console.log(this.model.attributes);
     $.post(this.model.get('route'), this.model.attributes)
       .done(this.followDone(this))
       .fail(function (response) {
@@ -180,17 +188,17 @@ var UserView = Backbone.View.extend({
 
 var RatingView = Backbone.View.extend({
   events: {
-    'click input': 'sendRating',
+    'click .rating > input': 'sendRating'
   },
 
   render: function () {
-    $(this.el).empty().html(userTemplate(this.model.attributes));
-    if (this.model.get('followed')) {
-      $(this.el).children('p').children('.f-button').text('☑');
-    } else {
-      $(this.el).children('p').children('.f-button').text('☐');
-    }
+    $(this.el).empty().html(ratingTemplate(this.model.attributes));
   },
+
+  sendRating: function (event) {
+    console.log('send a rating');
+    console.log(event.currentTarget.id);
+  }
 });
 
 var AppRouter = Backbone.Router.extend({
