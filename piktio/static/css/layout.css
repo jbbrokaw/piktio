@@ -387,3 +387,8 @@ footer {
   width: 50em;
   height: 10em;
 }
+
+.rating-box h1 {
+  text-align: center;
+  color: white;
+}

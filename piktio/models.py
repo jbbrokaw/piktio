@@ -4,6 +4,7 @@ from sqlalchemy import (
     Table,
     Unicode,
     ForeignKey,
+    Float
 )
 from sqlalchemy.types import DateTime
 from sqlalchemy.ext.declarative import declarative_base
@@ -220,6 +221,7 @@ class Game(Base):
     second_drawing_id = Column(Integer, ForeignKey(Drawing.id), nullable=True)
     second_description_id = Column(Integer, ForeignKey(Description.id), nullable=True)
     time_completed = Column(DateTime, nullable=True, index=True)
+    score = Column(Float, default="1.0")
 
     subject = relationship(Subject, backref="games")
     predicate = relationship(Predicate, backref="games")
@@ -256,4 +258,3 @@ class Strikes(Base):
     predicate = relationship(Predicate, backref='strikes')
     drawing = relationship(Drawing, backref='strikes')
     description = relationship(Description, backref='strikes')
-

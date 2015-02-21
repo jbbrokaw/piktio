@@ -29,6 +29,12 @@ var UserModel = Backbone.Model.extend({
   }
 });
 
+var ScoreModel = Backbone.Model.extend({
+  defaults: {
+    'csrf_token': $('#csrf').val(),
+  }
+});
+
 var GameCollectionView = Backbone.View.extend({
   events: {
     'click #all-games': 'allGames',
@@ -170,6 +176,21 @@ var UserView = Backbone.View.extend({
       view.render();
     };
   }
+});
+
+var RatingView = Backbone.View.extend({
+  events: {
+    'click input': 'sendRating',
+  },
+
+  render: function () {
+    $(this.el).empty().html(userTemplate(this.model.attributes));
+    if (this.model.get('followed')) {
+      $(this.el).children('p').children('.f-button').text('☑');
+    } else {
+      $(this.el).children('p').children('.f-button').text('☐');
+    }
+  },
 });
 
 var AppRouter = Backbone.Router.extend({

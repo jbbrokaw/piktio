@@ -50,14 +50,17 @@
       </div>
       <p class="timestamp">Completed: </p>
   </div>
- <fieldset class="rating">
-    <legend>Please rate:</legend>
-    <input type="radio" id="star5" name="rating" value="5" /><label for="star5" title="Rocks!">5 stars</label>
-    <input type="radio" id="star4" name="rating" value="4" /><label for="star4" title="Pretty good">4 stars</label>
-    <input type="radio" id="star3" name="rating" value="3" /><label for="star3" title="Meh">3 stars</label>
-    <input type="radio" id="star2" name="rating" value="2" /><label for="star2" title="Kinda bad">2 stars</label>
-    <input type="radio" id="star1" name="rating" value="1" /><label for="star1" title="Sucks big time">1 star</label>
-  </fieldset>
+  <div class="rating-box">
+    <h1>Current rating: 0.0 </h1>
+      <fieldset class="rating">
+        <legend>Rate:</legend>
+        <input type="radio" id="star5" name="rating" value="5" /><label for="star5" title="Fantastic">5 stars</label>
+        <input type="radio" id="star4" name="rating" value="4" /><label for="star4" title="Pretty good">4 stars</label>
+        <input type="radio" id="star3" name="rating" value="3" checked /><label for="star3" title="Okay">3 stars</label>
+        <input type="radio" id="star2" name="rating" value="2" /><label for="star2" title="Kind of bad">2 stars</label>
+        <input type="radio" id="star1" name="rating" value="1" /><label for="star1" title="Terrible">1 star</label>
+      </fieldset>
+  </div>
   <ul class="game-footer-box cf">
     <li class="g-button arrow-left">Newer</li>
     <li><a href="{{ 'home' | route_path }}" class="g-button">Play Again</a></li>
@@ -89,6 +92,17 @@
 {% endraw %}
 <script>
   initial = {{ collection | safe }}
+</script>
+<script id="rating-template" type="text/x-handlebars-template">
+<h1>Current rating: {{ score }}</h1>
+<fieldset class="rating">
+  <legend>Rate:</legend>
+  <input type="radio" id="star5" name="rating" value="5" /><label for="star5" title="Fantastic">5 stars</label>
+  <input type="radio" id="star4" name="rating" value="4" /><label for="star4" title="Pretty good">4 stars</label>
+  <input type="radio" id="star3" name="rating" value="3" /><label for="star3" title="Okay">3 stars</label>
+  <input type="radio" id="star2" name="rating" value="2" /><label for="star2" title="Kind of bad">2 stars</label>
+  <input type="radio" id="star1" name="rating" value="1" /><label for="star1" title="Terrible">1 star</label>
+</fieldset>
 </script>
 <script type="text/javascript" src="//code.jquery.com/jquery-1.11.0.min.js"></script>
 <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.7.0/underscore-min.js"></script>

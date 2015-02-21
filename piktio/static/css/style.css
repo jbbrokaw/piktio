@@ -571,7 +571,8 @@ footer {
 /* 'star-rating' component */
 .rating {
     margin: auto;
-    width: 320px;
+    max-width: 200px;
+    color: white;
 }
 
 /* :not(:checked) is a filter, so that browsers that don’t support :checked don’t
@@ -624,4 +625,9 @@ footer {
     position:relative;
     top:2px;
     left:2px;
+}
+
+.rating-box h1 {
+  text-align: center;
+  color: white;
 }
