@@ -206,12 +206,17 @@ var RatingView = Backbone.View.extend({
   sendRating: function (event) {
     this.model.set('author_score', $(event.currentTarget).val());
     $.post(this.model.get('route'), this.model.attributes)
-      .done(function (response) {
-        console.log(response);
-      })
+      .done(this.ratingDone(this))
       .fail(function (response) {
         console.log(response);
       });
+  },
+
+  ratingDone: function (view) {
+    return function (server_response) {
+      view.model.set(server_response);
+      view.render();
+    };
   }
 });
 

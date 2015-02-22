@@ -56,11 +56,18 @@ def author(author, request):
 def rating(game_id, request):
     average_score = DBSession.query(func.avg(Rating.rating).label("average_score"))\
         .filter(Rating.game == game_id).one()[0]
-    average_score = "%.2f" % average_score
+    if average_score is None:
+        average_score = "0.00"
+    else:
+        average_score = "%.2f" % average_score
+
     author_rating = DBSession.query(Rating).filter(
         Rating.rater == request.user.id,
         Rating.game == game_id).first()
-    author_score = author_rating.rating
+    if author_rating is None:
+        author_score = None
+    else:
+        author_score = author_rating.rating
 
     return {'game_id': game_id,
             'average_score': average_score,
