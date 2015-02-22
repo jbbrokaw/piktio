@@ -221,7 +221,6 @@ class Game(Base):
     second_drawing_id = Column(Integer, ForeignKey(Drawing.id), nullable=True)
     second_description_id = Column(Integer, ForeignKey(Description.id), nullable=True)
     time_completed = Column(DateTime, nullable=True, index=True)
-    score = Column(Float, default="1.0")
 
     subject = relationship(Subject, backref="games")
     predicate = relationship(Predicate, backref="games")

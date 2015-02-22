@@ -4,6 +4,7 @@
 <input id="url-root" type="hidden" name="url-root" value="{{ 'games' | route_path }}">
 <input id="csrf" type="hidden" name="csrf_token" value="{{ request.session.get_csrf_token() }}">
 <input id="follow-route" type="hidden" name="follow-route" value="{{ 'follow' | route_path }}">
+<input id="rate-route" type="hidden" name="follow-route" value="{{ 'rate' | route_path }}">
 {% endblock %}
 {% block scripts %}
 <script id="game-collection-template" type="text/x-handlebars-template">

@@ -33,7 +33,7 @@ def show_completed_game(gm, request):
 
             'time_completed': gm.time_completed.strftime("%m/%d/%y %H:%M"),
 
-            'rating': rating(gm, request)
+            'rating': rating(gm.id, request)
             }
 
 
@@ -53,16 +53,17 @@ def author(author, request):
             'csrf_token': request.session.get_csrf_token()}
 
 
-def rating(game, request):
+def rating(game_id, request):
     average_score = DBSession.query(func.avg(Rating.rating).label("average_score"))\
-        .filter(Rating.game == game.id).one()[0]
+        .filter(Rating.game == game_id).one()[0]
     average_score = "%.2f" % average_score
     author_rating = DBSession.query(Rating).filter(
         Rating.rater == request.user.id,
-        Rating.game == game.id).first()
+        Rating.game == game_id).first()
     author_score = author_rating.rating
 
-    return {'average_score': average_score,
+    return {'game_id': game_id,
+            'average_score': average_score,
             'author_score': author_score}
 
 _TITLES = {'predicate': 'Enter the predicate of a sentence',

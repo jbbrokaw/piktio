@@ -65,6 +65,9 @@ def main(global_config, **settings):
     config.add_route(
         'strike',
         '/{step:first_drawing|first_description|second_drawing|second_description}/strike')
+    config.add_route(
+        'rate',
+        '/rate')
     config.include('apex', route_prefix='/auth')
     config.scan()
     return config.make_wsgi_app()

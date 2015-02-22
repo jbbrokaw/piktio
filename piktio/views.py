@@ -19,6 +19,7 @@ from piktio.models import (
     PiktioProfile,
     InviteAddress,
     Strikes,
+    Rating
 )
 from piktio.storage import upload_photo
 from piktio.forms import DisplayNameForm, InviteFriendForm
@@ -338,7 +339,7 @@ You will never receive email from this site again.
 
 
 @view_config(route_name='strike', renderer='json',
-             permission='authenticated')
+             permission='authenticated', request_method='POST')
 def strike(request):
     """Add a strike to the prompt/drawing for this step, return a new prompt drawing"""
     game = DBSession.query(Game).filter(
@@ -382,3 +383,24 @@ def strike(request):
         request.session['step'] = 'second_description'
         next_game = get_valid_game(request)
         return serializers.step(next_game, request)
+
+
+@view_config(route_name='rate', renderer='json',
+             permission='authenticated', request_method='POST')
+def rate(request):
+    """Add a rating to a game, update ratings on page"""
+    # TODO add validation to this POST (form?)
+    game_id = request.POST['game_id']
+    current_rating = DBSession.query(Rating).filter(
+            Rating.game == game_id,
+            Rating.rater == request.user.id
+        ).first()
+    if not current_rating:
+        current_rating = Rating()
+        current_rating.game = game_id
+        current_rating.rater = request.user.id
+
+    current_rating.rating = int(request.POST['author_score'])
+    DBSession.add(current_rating)
+    DBSession.flush()
+    return serializers.rating(game_id, request)

@@ -34,6 +34,7 @@ var UserModel = Backbone.Model.extend({
 var RatingModel = Backbone.Model.extend({
   defaults: {
     'csrf_token': $('#csrf').val(),
+    'route': $('#rate-route').val()
   }
 });
 
@@ -203,8 +204,14 @@ var RatingView = Backbone.View.extend({
   },
 
   sendRating: function (event) {
-    console.log('send a rating');
-    console.log(event.currentTarget.id);
+    this.model.set('author_score', $(event.currentTarget).val());
+    $.post(this.model.get('route'), this.model.attributes)
+      .done(function (response) {
+        console.log(response);
+      })
+      .fail(function (response) {
+        console.log(response);
+      });
   }
 });
 
