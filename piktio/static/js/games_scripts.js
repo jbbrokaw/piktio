@@ -193,6 +193,13 @@ var RatingView = Backbone.View.extend({
 
   render: function () {
     $(this.el).empty().html(ratingTemplate(this.model.attributes));
+    var rating = this.model.get('author_score');
+    if (rating ===  null) {
+      $('.rating input').prop('checked', false);
+    } else {
+      $selected = $('.rating input').eq(-rating);
+      $selected.prop('checked', true);
+    }
   },
 
   sendRating: function (event) {

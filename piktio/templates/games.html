@@ -79,12 +79,8 @@
   <p>by: {{ display_name }}</p>
   <p>Follow: <span class="f-button"></span></p>
 </script>
-{% endraw %}
-<script>
-  initial = {{ collection | safe }}
-</script>
 <script id="rating-template" type="text/x-handlebars-template">
-<h1>Current rating: {{ score }}</h1>
+<h1>Current rating: {{ average_score }}</h1>
 <fieldset class="rating">
   <legend>Rate:</legend>
   <input type="radio" id="star5" name="rating" value="5" /><label for="star5" title="Fantastic">5 stars</label>
@@ -93,6 +89,10 @@
   <input type="radio" id="star2" name="rating" value="2" /><label for="star2" title="Kind of bad">2 stars</label>
   <input type="radio" id="star1" name="rating" value="1" /><label for="star1" title="Terrible">1 star</label>
 </fieldset>
+</script>
+{% endraw %}
+<script>
+  initial = {{ collection | safe }}
 </script>
 <script type="text/javascript" src="//code.jquery.com/jquery-1.11.0.min.js"></script>
 <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.7.0/underscore-min.js"></script>

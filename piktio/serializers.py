@@ -1,3 +1,6 @@
+from sqlalchemy.sql import func
+from models import DBSession, Rating
+
 def show_completed_game(gm, request):
     return {'id': gm.id,
 
@@ -28,7 +31,9 @@ def show_completed_game(gm, request):
             'second_description_author':
             author(gm.second_description.author, request),
 
-            'time_completed': gm.time_completed.strftime("%m/%d/%y %H:%M")
+            'time_completed': gm.time_completed.strftime("%m/%d/%y %H:%M"),
+
+            'rating': rating(gm, request)
             }
 
 
@@ -46,6 +51,19 @@ def author(author, request):
             'display_name': author.display_name,
             'followed': (author in request.user.followees),
             'csrf_token': request.session.get_csrf_token()}
+
+
+def rating(game, request):
+    average_score = DBSession.query(func.avg(Rating.rating).label("average_score"))\
+        .filter(Rating.game == game.id).one()[0]
+    average_score = "%.2f" % average_score
+    author_rating = DBSession.query(Rating).filter(
+        Rating.rater == request.user.id,
+        Rating.game == game.id).first()
+    author_score = author_rating.rating
+
+    return {'average_score': average_score,
+            'author_score': author_score}
 
 _TITLES = {'predicate': 'Enter the predicate of a sentence',
            'first_drawing': 'Draw this sentence',
