@@ -159,7 +159,7 @@ var GameView = Backbone.View.extend({
 
 var UserView = Backbone.View.extend({
   events: {
-    'click .f-button': 'follow',
+    'click .f-button': 'follow'
   },
 
   render: function () {
@@ -222,6 +222,7 @@ var RatingView = Backbone.View.extend({
 
 var AppRouter = Backbone.Router.extend({
   routes: {
+    ":id": "showGame",
     "*actions": "defaultRoute"
   },
 
@@ -275,8 +276,35 @@ app_router.on('route:defaultRoute', function () {
   this.mainView.render();
   this.listenTo(this.games, "load", this.onCollectionLoad);
   this.listenTo(this.games, "selection", this.onSelection);
-  this.games.reset(initial);
+  this.games.reset(initial);  // initial is provided in html
   this.games.trigger('load');
+});
+
+app_router.on('route:showGame', function (id) {
+  if (typeof(this.games) === 'undefined') {
+    this.games = new GameCollection();
+    this.listenTo(this.games, "load", this.onCollectionLoad);
+    this.listenTo(this.games, "selection", this.onSelection);
+    this.games.reset(initial);  // initial is provided in html
+  }
+  if (typeof(this.mainView) === 'undefined') {
+    this.mainView = new GameCollectionView({model: this.games});
+    this.mainView.render();
+  }
+  id = parseInt(id);
+  console.log(id);
+  console.log(typeof(id));
+  var chosenGame = this.games.findWhere({'id': id});
+  var chosenIndex = this.games.models.indexOf(chosenGame);
+  if (chosenIndex === -1) {
+    // TODO: Maybe explain what happened to the user?
+    console.log("Bad Game Index");
+    chosenIndex = 0;
+  }
+  this.games.selected = chosenIndex;
+  this.games.trigger('selection');
+
+
 });
 
 Backbone.history.start();
