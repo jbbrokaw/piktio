@@ -153,6 +153,8 @@ var GameView = Backbone.View.extend({
     });
     ratingView.render();
 
+    app_router.navigate(String(this.model.get('id')));
+
     return this;
   }
 });
@@ -292,8 +294,6 @@ app_router.on('route:showGame', function (id) {
     this.mainView.render();
   }
   id = parseInt(id);
-  console.log(id);
-  console.log(typeof(id));
   var chosenGame = this.games.findWhere({'id': id});
   var chosenIndex = this.games.models.indexOf(chosenGame);
   if (chosenIndex === -1) {
@@ -303,8 +303,6 @@ app_router.on('route:showGame', function (id) {
   }
   this.games.selected = chosenIndex;
   this.games.trigger('selection');
-
-
 });
 
 Backbone.history.start();
